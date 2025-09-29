@@ -1,3 +1,100 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "album-1",
+      "description": "Abstract colorful waves",
+      "imageUrl": "https://images.unsplash.com/photo-1659905323699-7d7c8e0328d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMGNvbG9yZnVsfGVufDB8fHx8MTc1OTA2NzgyM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract colorful"
+    },
+    {
+      "id": "album-2",
+      "description": "Neon city skyline at night",
+      "imageUrl": "https://images.unsplash.com/photo-1519608487953-e999c86e7455?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxuZW9uJTIwY2l0eXxlbnwwfHx8fDE3NTkwNDU1MzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "neon city"
+    },
+    {
+      "id": "album-3",
+      "description": "Serene forest landscape",
+      "imageUrl": "https://images.unsplash.com/photo-1511884642898-4c92249e20b6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmb3Jlc3QlMjBsYW5kc2NhcGV8ZW58MHx8fHwxNzU5MDY3NDY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "forest landscape"
+    },
+    {
+      "id": "album-4",
+      "description": "Close up of a vintage record player",
+      "imageUrl": "https://images.unsplash.com/photo-1514846160150-2cfb150b48ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxyZWNvcmQlMjBwbGF5ZXJ8ZW58MHx8fHwxNzU5MTE3NTAyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "record player"
+    },
+    {
+      "id": "album-5",
+      "description": "Minimalist geometric pattern",
+      "imageUrl": "https://images.unsplash.com/photo-1605106702842-01a887a31122?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxnZW9tZXRyaWMlMjBwYXR0ZXJufGVufDB8fHx8MTc1OTEzOTcwOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "geometric pattern"
+    },
+    {
+      "id": "album-6",
+      "description": "Guitar leaning against a brick wall",
+      "imageUrl": "https://images.unsplash.com/photo-1666528422152-6ea88c6954ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxndWl0YXIlMjBicmlja3xlbnwwfHx8fDE3NTkxMzk3MDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "guitar brick"
+    },
+    {
+      "id": "album-7",
+      "description": "Ocean waves crashing on a shore",
+      "imageUrl": "https://images.unsplash.com/photo-1570077533412-664829f85aed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxvY2VhbiUyMHdhdmVzfGVufDB8fHx8MTc1OTA1NzE2Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ocean waves"
+    },
+    {
+      "id": "album-8",
+      "description": "Crowd at a music concert",
+      "imageUrl": "https://images.unsplash.com/photo-1709090083073-d130ac28cc19?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtdXNpYyUyMGNvbmNlcnR8ZW58MHx8fHwxNzU5MTM2NjEzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "music concert"
+    },
+    {
+      "id": "album-9",
+      "description": "Retro cassette tape",
+      "imageUrl": "https://images.unsplash.com/photo-1700951372714-98979a8803a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjYXNzZXR0ZSUyMHRhcGV8ZW58MHx8fHwxNzU5MTM4MDQyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cassette tape"
+    },
+    {
+      "id": "album-10",
+      "description": "Sound mixing board in a studio",
+      "imageUrl": "https://images.unsplash.com/photo-1500627345056-c0094b32aaf3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtaXhpbmclMjBib2FyZHxlbnwwfHx8fDE3NTkxMjMwMzF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mixing board"
+    },
+    {
+      "id": "album-11",
+      "description": "Vibrant street art mural",
+      "imageUrl": "https://images.unsplash.com/photo-1487452066049-a710f7296400?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzdHJlZXQlMjBhcnR8ZW58MHx8fHwxNzU5MTMxMDEwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "street art"
+    },
+    {
+      "id": "album-12",
+      "description": "Moody black and white portrait",
+      "imageUrl": "https://images.unsplash.com/photo-1727188211338-297f08d42827?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtb29keSUyMHBvcnRyYWl0fGVufDB8fHx8MTc1OTEyNzgxM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "moody portrait"
+    },
+    {
+      "id": "avatar-1",
+      "description": "User avatar 1",
+      "imageUrl": "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NTkxMDU0Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-2",
+      "description": "User avatar 2",
+      "imageUrl": "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwZXJzb24lMjBzbWlsaW5nfGVufDB8fHx8MTc1OTEyNDY1Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person smiling"
+    },
+    {
+      "id": "avatar-3",
+      "description": "User avatar 3",
+      "imageUrl": "https://images.unsplash.com/photo-1568923637777-4cf6f548fec0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwZXJzb24lMjBvdXRkb29yfGVufDB8fHx8MTc1OTEyNTc5N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person outdoor"
+    },
+    {
+      "id": "avatar-4",
+      "description": "User avatar 4",
+      "imageUrl": "https://images.unsplash.com/photo-1586344153246-973c5d0d1141?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBnbGFzc2VzfGVufDB8fHx8MTc1OTAzMzYwMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person glasses"
+    }
+  ]
 }
