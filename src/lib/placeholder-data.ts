@@ -71,9 +71,15 @@ export const albums: Album[] = [
   { id: "album-6", title: "Rock Anthems", artist: artists[1], coverArt: getImage("album-6") },
 ];
 
+// To use your own song files:
+// 1. Add your .mp3 files to the `public/audio` directory.
+// 2. Update the `songUrl` to point to your local file, e.g., `/audio/your-song-filename.mp3`.
 export const songs: Song[] = [
-  { id: "song-1", title: "Good Times", artist: artists[0], album: albums[0], duration: "3:45", songUrl: "https://cdn.pixabay.com/audio/2022/08/04/audio_2dde64b24c.mp3" },
-  { id: "song-2", title: "Action Sport", artist: artists[1], album: albums[1], duration: "2:10", songUrl: "https://cdn.pixabay.com/audio/2024/02/08/audio_731a896d82.mp3" },
+  // This song points to a local file in `public/audio`. 
+  // Replace 'good-times.mp3' with your actual filename.
+  { id: "song-1", title: "Good Times", artist: artists[0], album: albums[0], duration: "3:45", songUrl: "/audio/good-times.mp3" }, 
+  { id: "song-2", title: "Action Sport", artist: artists[1], album: albums[1], duration: "2:10", songUrl: "/audio/action-sport.mp3" },
+  // These songs are still pointing to remote URLs for demonstration purposes.
   { id: "song-3", title: "Summer Party", artist: artists[2], album: albums[2], duration: "3:05", songUrl: "https://cdn.pixabay.com/audio/2023/05/11/audio_a7e8e6b18a.mp3" },
   { id: "song-4", title: "Cyberpunk", artist: artists[3], album: albums[3], duration: "4:20", songUrl: "https://cdn.pixabay.com/audio/2024/05/23/audio_71b0728741.mp3" },
   { id: "song-5", title: "Lofi Study", artist: artists[0], album: albums[4], duration: "2:50", songUrl: "https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf01a.mp3" },
