@@ -2,10 +2,16 @@ import MainLayout from "@/components/layout/main-layout";
 import { MusicCard } from "@/components/music-card";
 import { allMusic } from "@/lib/placeholder-data";
 
+// Helper to get unique items by a key
+function getUniqueItems<T>(items: T[], key: keyof T): T[] {
+  return [...new Map(items.map(item => [item[key], item])).values()];
+}
+
 export default function BrowsePage() {
-  const newReleases = [...allMusic].sort(() => 0.5 - Math.random()).slice(0, 6);
-  const topCharts = [...allMusic].sort(() => 0.5 - Math.random()).slice(0, 6);
-  const genres = [...allMusic].sort(() => 0.5 - Math.random()).slice(0, 12);
+  const uniqueMusic = getUniqueItems(allMusic, 'id');
+  const newReleases = [...uniqueMusic].sort(() => 0.5 - Math.random()).slice(0, 6);
+  const topCharts = [...uniqueMusic].sort(() => 0.5 - Math.random()).slice(0, 6);
+  const genres = [...uniqueMusic].sort(() => 0.5 - Math.random()).slice(0, 12);
 
   return (
     <MainLayout>
