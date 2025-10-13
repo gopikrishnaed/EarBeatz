@@ -1,5 +1,3 @@
-import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MainLayout from "@/components/layout/main-layout";
 import { MusicCard } from "@/components/music-card";
 import { madeForYou, recentlyPlayed } from "@/lib/placeholder-data";

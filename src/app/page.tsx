@@ -3,42 +3,24 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Music } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 export default function IntroPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push('/login');
-    }, 1500); // 1.5 seconds
-
-    return () => clearTimeout(timer);
+    // Redirect to login page immediately on load
+    router.replace('/login');
   }, [router]);
 
+  // Render a loading state while redirecting
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-background">
-      <div className="flex flex-col items-center gap-4 animate-fade-in-scale">
-        <Music className="h-24 w-24 text-primary" />
+      <div className="flex flex-col items-center gap-4">
+        <Music className="h-24 w-24 text-primary animate-pulse" />
         <h1 className="text-5xl font-bold font-headline tracking-tight">
           EarBeatz
         </h1>
       </div>
-      <style jsx global>{`
-        @keyframes fade-in-scale {
-          from {
-            opacity: 0;
-            transform: scale(0.8);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        .animate-fade-in-scale {
-          animation: fade-in-scale 1s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 }
