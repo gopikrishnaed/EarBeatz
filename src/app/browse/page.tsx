@@ -38,8 +38,8 @@ export default function BrowsePage() {
         <section>
           <h2 className="text-2xl font-semibold font-headline mb-4">Genres</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {genres.map((item) => (
-               <div key={item.id} className="bg-card/80 rounded-lg p-4 text-center font-semibold hover:bg-card transition-colors">{item.type === 'album' ? 'Rock' : item.type === 'playlist' ? 'Pop' : 'Hip-Hop' }</div>
+            {genres.map((item, index) => (
+               <div key={`${item.id}-${index}`} className="bg-card/80 rounded-lg p-4 text-center font-semibold hover:bg-card transition-colors">{item.type === 'album' ? 'Rock' : item.type === 'playlist' ? 'Pop' : 'Hip-Hop' }</div>
             ))}
           </div>
         </section>
