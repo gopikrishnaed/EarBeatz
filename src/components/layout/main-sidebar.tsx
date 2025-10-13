@@ -34,7 +34,7 @@ export default function MainSidebar() {
   const pathname = usePathname();
 
   // A simple way to check if we're in a "logged in" section of the app
-  const isLoggedIn = !['/login', '/signup'].includes(pathname);
+  const isLoggedIn = !['/login', '/signup', '/'].includes(pathname);
 
   return (
     <>
@@ -45,8 +45,8 @@ export default function MainSidebar() {
         </div>
       </SidebarHeader>
       
-      {isLoggedIn && (
-        <SidebarContent className="p-2">
+      <SidebarContent className="p-2">
+        {isLoggedIn ? (
           <SidebarMenu>
             {NAV_ITEMS.map((item) => (
               <SidebarMenuItem key={item.href}>
@@ -63,35 +63,37 @@ export default function MainSidebar() {
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
-        </SidebarContent>
-      )}
-
-      {!isLoggedIn && (
-        <SidebarContent className="p-2 flex-grow">
-          {/* This empty content will push the footer to the bottom */}
-        </SidebarContent>
-      )}
+        ) : (
+           <div className="flex-grow">
+            {/* This empty content will push the footer to the bottom */}
+           </div>
+        )}
+      </SidebarContent>
 
       <SidebarFooter className="p-2">
-         <SidebarSeparator />
-         <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === "/login"} tooltip="Login">
-                <Link href="/login">
-                  <LogIn />
-                  <span>Login</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === "/signup"} tooltip="Sign Up">
-                <Link href="/signup">
-                  <UserPlus />
-                  <span>Sign Up</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-         </SidebarMenu>
+         {!isLoggedIn && (
+           <>
+            <SidebarSeparator />
+            <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname === "/login"} tooltip="Login">
+                    <Link href="/login">
+                      <LogIn />
+                      <span>Login</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname === "/signup"} tooltip="Sign Up">
+                    <Link href="/signup">
+                      <UserPlus />
+                      <span>Sign Up</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+            </SidebarMenu>
+           </>
+         )}
       </SidebarFooter>
     </>
   );
