@@ -10,8 +10,8 @@ export default function IntroPage() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push('/dashboard');
-    }, 3000); // 3 seconds
+      router.push('/login');
+    }, 1500); // 1.5 seconds
 
     return () => clearTimeout(timer);
   }, [router]);
@@ -36,7 +36,7 @@ export default function IntroPage() {
           }
         }
         .animate-fade-in-scale {
-          animation: fade-in-scale 1.5s ease-out forwards;
+          animation: fade-in-scale 1s ease-out forwards;
         }
       `}</style>
     </div>
