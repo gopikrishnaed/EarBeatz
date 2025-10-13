@@ -1,40 +1,44 @@
-import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import MainLayout from "@/components/layout/main-layout";
-import { MusicCard } from "@/components/music-card";
-import { madeForYou, recentlyPlayed } from "@/lib/placeholder-data";
+"use client";
 
-export default function Home() {
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Music } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export default function IntroPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.push('/dashboard');
+    }, 3000); // 3 seconds
+
+    return () => clearTimeout(timer);
+  }, [router]);
+
   return (
-    <MainLayout>
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-4xl font-bold font-headline tracking-tight">
-            Good Afternoon
-          </h1>
-          <p className="text-muted-foreground">
-            Explore your favorite music, discover new tracks, and share your vibes.
-          </p>
-        </div>
-
-        <section>
-          <h2 className="text-2xl font-semibold font-headline mb-4">Made for you</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {madeForYou.map((item) => (
-              <MusicCard key={item.id} item={item} />
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold font-headline mb-4">Recently Played</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {recentlyPlayed.map((item) => (
-              <MusicCard key={item.id} item={item} />
-            ))}
-          </div>
-        </section>
+    <div className="flex h-screen w-screen items-center justify-center bg-background">
+      <div className="flex flex-col items-center gap-4 animate-fade-in-scale">
+        <Music className="h-24 w-24 text-primary" />
+        <h1 className="text-5xl font-bold font-headline tracking-tight">
+          EarBeatz
+        </h1>
       </div>
-    </MainLayout>
+      <style jsx global>{`
+        @keyframes fade-in-scale {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        .animate-fade-in-scale {
+          animation: fade-in-scale 1.5s ease-out forwards;
+        }
+      `}</style>
+    </div>
   );
 }

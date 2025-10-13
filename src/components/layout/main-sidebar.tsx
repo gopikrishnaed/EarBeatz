@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Home", icon: Home },
+  { href: "/dashboard", label: "Home", icon: Home },
   { href: "/browse", label: "Browse", icon: Compass },
   { href: "/discover", label: "Discover", icon: ListMusic },
   { href: "/generate", label: "Generate Playlist", icon: Sparkles },
