@@ -33,6 +33,9 @@ const NAV_ITEMS = [
 export default function MainSidebar() {
   const pathname = usePathname();
 
+  // A simple way to check if we're in a "logged in" section of the app
+  const isLoggedIn = !['/login', '/signup'].includes(pathname);
+
   return (
     <>
       <SidebarHeader>
@@ -41,24 +44,34 @@ export default function MainSidebar() {
           <h1 className="text-2xl font-bold font-headline">EarBeatz</h1>
         </div>
       </SidebarHeader>
-      <SidebarContent className="p-2">
-        <SidebarMenu>
-          {NAV_ITEMS.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname === item.href}
-                tooltip={item.label}
-              >
-                <Link href={item.href}>
-                  <item.icon />
-                  <span>{item.label}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarContent>
+      
+      {isLoggedIn && (
+        <SidebarContent className="p-2">
+          <SidebarMenu>
+            {NAV_ITEMS.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === item.href}
+                  tooltip={item.label}
+                >
+                  <Link href={item.href}>
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
+      )}
+
+      {!isLoggedIn && (
+        <SidebarContent className="p-2 flex-grow">
+          {/* This empty content will push the footer to the bottom */}
+        </SidebarContent>
+      )}
+
       <SidebarFooter className="p-2">
          <SidebarSeparator />
          <SidebarMenu>
