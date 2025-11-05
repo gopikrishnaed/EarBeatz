@@ -2,7 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { MusicPlayerProvider } from '@/context/music-player-context';
-import { getSongs } from '@/lib/actions/music';
+import { getSongs } from '@/lib/supabase/queries';
 import type { Song } from '@/lib/types';
 
 export const metadata: Metadata = {
