@@ -11,6 +11,7 @@ import {
   Users,
   LogIn,
   UserPlus,
+  Database,
 } from "lucide-react";
 import {
   SidebarHeader,
@@ -28,12 +29,12 @@ const NAV_ITEMS = [
   { href: "/discover", label: "Discover", icon: ListMusic },
   { href: "/generate", label: "Generate Playlist", icon: Sparkles },
   { href: "/feed", label: "Feed", icon: Users },
+  { href: "/supabase", label: "Supabase", icon: Database },
 ];
 
 export default function MainSidebar() {
   const pathname = usePathname();
 
-  // A simple way to check if we're in a "logged in" section of the app
   const isLoggedIn = !['/login', '/signup', '/'].includes(pathname);
 
   return (
@@ -65,7 +66,6 @@ export default function MainSidebar() {
           </SidebarMenu>
         ) : (
            <div className="flex-grow">
-            {/* This empty content will push the footer to the bottom */}
            </div>
         )}
       </SidebarContent>
