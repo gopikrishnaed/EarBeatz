@@ -17,7 +17,7 @@ export function MusicPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
-    if (audioRef.current && currentSong) {
+    if (audioRef.current && currentSong?.songUrl) {
       if (isPlaying) {
         audioRef.current.play().catch(e => console.error("Playback failed", e));
       } else {
@@ -46,7 +46,7 @@ export function MusicPlayer() {
   }
 
   const handleSeek = (value: number[]) => {
-    if (audioRef.current) {
+    if (audioRef.current && currentSong?.songUrl) {
       audioRef.current.currentTime = (value[0] / 100) * audioRef.current.duration;
     }
   };
@@ -71,17 +71,21 @@ export function MusicPlayer() {
   if (!currentSong) {
     return null;
   }
+  
+  const canPlay = !!currentSong.songUrl;
 
   return (
     <footer className="sticky bottom-0 z-20 border-t bg-background/95 backdrop-blur-sm">
-      <audio
-        ref={audioRef}
-        src={currentSong.songUrl}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onEnded={nextSong}
-        key={currentSong.id} // Important: force re-render on song change
-      />
+      {canPlay && (
+        <audio
+          ref={audioRef}
+          src={currentSong.songUrl}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onEnded={nextSong}
+          key={currentSong.id} // Important: force re-render on song change
+        />
+      )}
       <div className="container mx-auto p-3 flex items-center justify-between">
         <div className="flex items-center gap-4 w-1/4">
           <Image
@@ -102,7 +106,7 @@ export function MusicPlayer() {
                 <Button variant="ghost" size="icon" onClick={prevSong} disabled={!prevSong}>
                     <SkipBack className="w-5 h-5" />
                 </Button>
-                <Button variant="default" size="icon" className="w-12 h-12 rounded-full" onClick={isPlaying ? pauseSong : () => playSong(currentSong)}>
+                <Button variant="default" size="icon" className="w-12 h-12 rounded-full" onClick={isPlaying ? pauseSong : () => playSong(currentSong)} disabled={!canPlay}>
                     {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current" />}
                 </Button>
                 <Button variant="ghost" size="icon" onClick={nextSong} disabled={!nextSong}>
@@ -117,13 +121,14 @@ export function MusicPlayer() {
                     step={1}
                     onValueChange={handleSeek}
                     className="w-full"
+                    disabled={!canPlay}
                 />
                 <span className="text-xs text-muted-foreground">{formatTime(duration)}</span>
             </div>
         </div>
 
         <div className="flex items-center gap-2 w-1/4 justify-end">
-            <Button variant="ghost" size="icon" onClick={toggleMute}>
+            <Button variant="ghost" size="icon" onClick={toggleMute} disabled={!canPlay}>
               {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
             </Button>
             <Slider
@@ -132,6 +137,7 @@ export function MusicPlayer() {
                 step={1}
                 onValueChange={handleVolumeChange}
                 className="w-24"
+                disabled={!canPlay}
             />
         </div>
       </div>

@@ -3,20 +3,11 @@
 import { createClient } from './server-client';
 import type { AlbumFromDB, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB } from '@/lib/types';
 
-// Placeholder song URLs for demonstration
-const placeholderSongs = [
-    'https://cdn.pixabay.com/download/audio/2022/12/22/audio_fb4b16e49e.mp3', // Lofi Chill
-    'https://cdn.pixabay.com/download/audio/2022/11/22/audio_15a8b13264.mp3', // Ambient Classical Guitar
-    'https://cdn.pixabay.com/download/audio/2022/08/04/audio_2dde64b97c.mp3', // Just Relax
-    'https://cdn.pixabay.com/download/audio/2024/04/24/audio_34902b97c7.mp3', // Upbeat Funk
-    'https://cdn.pixabay.com/download/audio/2023/04/18/audio_1c8898165b.mp3'  // Cinematic Emotional
-];
-
-function mapSongData(songData: SongFromDB, index: number): Song {
+function mapSongData(songData: SongFromDB): Song {
     return {
         id: songData.id,
         title: songData.title,
-        songUrl: songData.song_url || placeholderSongs[index % placeholderSongs.length],
+        songUrl: songData.song_url || '', // Use the URL from DB or an empty string
         artist: {
           id: songData.artists?.id || '',
           name: songData.artists?.name || 'Unknown Artist'
@@ -81,17 +72,7 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
         return [];
     }
     
-    if (!data) {
-        return [];
-    }
-    
-    // Inject placeholder URLs if the song_url is null
-    const modifiedData = data.map((song, index) => ({
-        ...song,
-        song_url: song.song_url || placeholderSongs[index % placeholderSongs.length]
-    }));
-
-    return modifiedData || [];
+    return data || [];
 }
 
 export async function getAlbums(): Promise<AlbumFromDB[]> {
