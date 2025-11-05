@@ -2,30 +2,40 @@ import MainLayout from "@/components/layout/main-layout";
 import { FeedPostCard } from "@/components/feed-post-card";
 import { getFeedPosts } from "@/lib/supabase/queries";
 import { formatDistanceToNow } from 'date-fns';
+import type { FeedPost, FeedPostFromDB } from "@/lib/types";
+
+// Type guard to check if a post has all required nested data
+function isValidPost(post: FeedPostFromDB): boolean {
+  return !!(post.users && post.songs && post.songs.artists && post.songs.albums);
+}
 
 export default async function FeedPage() {
   const posts = await getFeedPosts();
 
-  const formattedPosts = posts.map(post => ({
+  const formattedPosts: FeedPost[] = posts
+    .filter(isValidPost)
+    .map(post => ({
     id: post.id,
     user: {
-      id: post.users?.id || '',
-      name: post.users?.name || 'Unknown User',
+      id: post.users!.id || '',
+      name: post.users!.name || 'Unknown User',
       avatar: {
-        imageUrl: post.users?.avatar_url || '',
+        imageUrl: post.users!.avatar_url || '',
       }
     },
     song: {
-      id: post.songs?.id || '',
-      title: post.songs?.title || 'Unknown Song',
+      id: post.songs!.id || '',
+      title: post.songs!.title || 'Unknown Song',
+      songUrl: '', // Not needed for feed card
       artist: {
-        name: post.songs?.artists?.name || 'Unknown Artist',
+        id: '', // Not available in this query
+        name: post.songs!.artists?.name || 'Unknown Artist',
       },
       album: {
-        id: post.songs?.albums?.id || '',
-        title: post.songs?.albums?.title || '',
+        id: post.songs!.albums?.id || '',
+        title: post.songs!.albums?.title || '',
         coverArt: {
-          imageUrl: post.songs?.albums?.cover_art_url || '',
+          imageUrl: post.songs!.albums?.cover_art_url || '',
         },
       }
     },
@@ -49,9 +59,18 @@ export default async function FeedPage() {
           </div>
 
           <div className="space-y-6">
-            {formattedPosts.map((post) => (
-              <FeedPostCard key={post.id} post={post} />
-            ))}
+            {formattedPosts.length > 0 ? (
+              formattedPosts.map((post) => (
+                <FeedPostCard key={post.id} post={post} />
+              ))
+            ) : (
+              <div className="text-center py-10 border rounded-lg bg-card/50">
+                <p className="text-lg font-medium">Your feed is empty</p>
+                <p className="text-muted-foreground">
+                  Follow friends to see what they are listening to.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
