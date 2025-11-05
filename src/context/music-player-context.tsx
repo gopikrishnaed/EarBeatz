@@ -1,9 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import type { Song, SongFromDB } from '@/lib/types';
-import { getSongs } from '@/lib/supabase/queries';
-
+import { createContext, useContext, useState, ReactNode } from 'react';
+import type { Song } from '@/lib/types';
 
 interface MusicPlayerContextType {
   currentSong: Song | null;
@@ -17,40 +15,25 @@ interface MusicPlayerContextType {
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(undefined);
 
-export const MusicPlayerProvider = ({ children }: { children: ReactNode }) => {
+export const MusicPlayerProvider = ({ 
+  children, 
+  initialPlaylist = [] 
+}: { 
+  children: ReactNode, 
+  initialPlaylist?: Song[] 
+}) => {
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
-  const [playlist, setPlaylist] = useState<Song[]>([]);
+  const [playlist, setPlaylist] = useState<Song[]>(initialPlaylist);
   const [isPlaying, setIsPlaying] = useState(false);
-
-  useEffect(() => {
-    const fetchInitialPlaylist = async () => {
-      const songsFromDB = await getSongs();
-      const formattedSongs: Song[] = songsFromDB.map(s => ({
-        id: s.id,
-        title: s.title,
-        songUrl: s.song_url,
-        artist: {
-          id: s.artists?.id || '',
-          name: s.artists?.name || 'Unknown Artist'
-        },
-        album: {
-          id: s.albums?.id || '',
-          title: s.albums?.title || 'Unknown Album',
-          coverArt: {
-            imageUrl: s.albums?.cover_art_url || ''
-          }
-        }
-      }));
-      setPlaylist(formattedSongs);
-    };
-    fetchInitialPlaylist();
-  }, []);
 
   const playSong = (song: Song, newPlaylist?: Song[]) => {
     setCurrentSong(song);
     setIsPlaying(true);
     if (newPlaylist) {
       setPlaylist(newPlaylist);
+    } else if (!playlist.find(s => s.id === song.id)) {
+      // If song is not in the current playlist, create a new one.
+      setPlaylist([song, ...playlist]);
     }
   };
 
@@ -59,7 +42,7 @@ export const MusicPlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const nextSong = () => {
-    if (currentSong) {
+    if (currentSong && playlist.length > 0) {
       const currentIndex = playlist.findIndex(s => s.id === currentSong.id);
       const nextIndex = (currentIndex + 1) % playlist.length;
       playSong(playlist[nextIndex]);
@@ -67,7 +50,7 @@ export const MusicPlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const prevSong = () => {
-    if (currentSong) {
+    if (currentSong && playlist.length > 0) {
       const currentIndex = playlist.findIndex(s => s.id === currentSong.id);
       const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
       playSong(playlist[prevIndex]);

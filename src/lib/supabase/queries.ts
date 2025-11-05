@@ -1,27 +1,7 @@
 'use server';
 
-import { supabase } from './client';
+import { supabase } from './server-client';
 import type { AlbumFromDB, FeedPostFromDB, PlaylistFromDB, SongFromDB } from '@/lib/types';
-
-export async function getSongs(): Promise<SongFromDB[]> {
-    const { data, error } = await supabase
-        .from('songs')
-        .select(`
-            id,
-            title,
-            song_url,
-            duration_in_seconds,
-            metadata,
-            artists ( id, name ),
-            albums ( id, title, cover_art_url )
-        `);
-
-    if (error) {
-        console.error('Error fetching songs:', error);
-        return [];
-    }
-    return data || [];
-}
 
 export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
     const { data, error } = await supabase
