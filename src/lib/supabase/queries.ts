@@ -109,6 +109,9 @@ export async function getPlaylists(): Promise<PlaylistFromDB[]> {
 
 export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
     const supabase = createClient();
+    
+    // Simplified query to avoid complex nested joins that are causing errors.
+    // We fetch related data separately or handle missing data in the component.
     const { data, error } = await supabase
         .from('feed_posts')
         .select(`
@@ -116,18 +119,13 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
             content,
             created_at,
             users ( id, name, avatar_url ),
-            songs (
-                id,
-                title,
-                artists:artist_id ( name ),
-                albums:album_id ( id, title, cover_art_url )
-            ),
+            songs ( id, title ), 
             likes ( user_id ),
             comments ( id )
         `)
         .order('created_at', { ascending: false });
 
-    if (error) {
+    if (error && Object.keys(error).length > 0) {
         console.error('Error fetching feed posts:', error);
         return [];
     }

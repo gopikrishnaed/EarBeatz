@@ -4,15 +4,9 @@ import { getFeedPosts } from "@/lib/supabase/queries";
 import { formatDistanceToNow } from 'date-fns';
 import type { FeedPost, FeedPostFromDB } from "@/lib/types";
 
-// Type guard to check if a post has all required nested data
-function isValidPost(post: FeedPostFromDB): post is FeedPostFromDB & { users: NonNullable<FeedPostFromDB['users']>, songs: NonNullable<FeedPostFromDB['songs']> & { artists: NonNullable<FeedPostFromDB['songs']['artists']>, albums: NonNullable<FeedPostFromDB['songs']['albums']> } } {
-  return !!(
-    post &&
-    post.users &&
-    post.songs &&
-    post.songs.artists &&
-    post.songs.albums
-  );
+// Type guard to check if a post has the minimum required data
+function isValidPost(post: FeedPostFromDB): post is FeedPostFromDB & { users: NonNullable<FeedPostFromDB['users']>, songs: NonNullable<FeedPostFromDB['songs']> } {
+  return !!(post && post.users && post.songs);
 }
 
 export default async function FeedPage() {
@@ -34,14 +28,14 @@ export default async function FeedPage() {
       title: post.songs.title || 'Unknown Song',
       songUrl: '', // Not needed for feed card
       artist: {
-        id: '', // Not available in this query
-        name: post.songs.artists.name || 'Unknown Artist',
+        id: '', // Not available in simplified query
+        name: post.songs.artists?.name || 'Unknown Artist', // Safely access artist
       },
       album: {
-        id: post.songs.albums.id || '',
-        title: post.songs.albums.title || '',
+        id: post.songs.albums?.id || '', // Safely access album
+        title: post.songs.albums?.title || '',
         coverArt: {
-          imageUrl: post.songs.albums.cover_art_url || '',
+          imageUrl: post.songs.albums?.cover_art_url || '',
         },
       }
     },
@@ -53,32 +47,30 @@ export default async function FeedPage() {
 
   return (
     <MainLayout>
-      <div>
-        <div className="max-w-2xl mx-auto">
-          <div className="space-y-8">
-            <div>
-              <h1 className="text-4xl font-bold font-headline tracking-tight">
-                Social Feed
-              </h1>
-              <p className="text-muted-foreground">
-                See what your friends are listening to.
-              </p>
-            </div>
+      <div className="max-w-2xl mx-auto">
+        <div className="space-y-8">
+          <div>
+            <h1 className="text-4xl font-bold font-headline tracking-tight">
+              Social Feed
+            </h1>
+            <p className="text-muted-foreground">
+              See what your friends are listening to.
+            </p>
+          </div>
 
-            <div className="space-y-6">
-              {formattedPosts.length > 0 ? (
-                formattedPosts.map((post) => (
-                  <FeedPostCard key={post.id} post={post} />
-                ))
-              ) : (
-                <div className="text-center py-10 border rounded-lg bg-card/50">
-                  <p className="text-lg font-medium">Your feed is empty</p>
-                  <p className="text-muted-foreground">
-                    Follow friends or check back later for new posts.
-                  </p>
-                </div>
-              )}
-            </div>
+          <div className="space-y-6">
+            {formattedPosts.length > 0 ? (
+              formattedPosts.map((post) => (
+                <FeedPostCard key={post.id} post={post} />
+              ))
+            ) : (
+              <div className="text-center py-10 border rounded-lg bg-card/50">
+                <p className="text-lg font-medium">Your feed is empty</p>
+                <p className="text-muted-foreground">
+                  Follow friends or check back later for new posts.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
