@@ -1,8 +1,5 @@
 // IMPORTANT: This file is only used on the server.
 // See `client.ts` for the client-side Supabase client.
-import { config } from 'dotenv';
-config({ path: '.env.local' });
-
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/types/supabase';
 
