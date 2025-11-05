@@ -5,8 +5,14 @@ import { formatDistanceToNow } from 'date-fns';
 import type { FeedPost, FeedPostFromDB } from "@/lib/types";
 
 // Type guard to check if a post has all required nested data
-function isValidPost(post: FeedPostFromDB): boolean {
-  return !!(post.users && post.songs && post.songs.artists && post.songs.albums);
+function isValidPost(post: FeedPostFromDB): post is FeedPostFromDB & { users: NonNullable<FeedPostFromDB['users']>, songs: NonNullable<FeedPostFromDB['songs']> & { artists: NonNullable<FeedPostFromDB['songs']['artists']>, albums: NonNullable<FeedPostFromDB['songs']['albums']> } } {
+  return !!(
+    post &&
+    post.users &&
+    post.songs &&
+    post.songs.artists &&
+    post.songs.albums
+  );
 }
 
 export default async function FeedPage() {
@@ -17,25 +23,25 @@ export default async function FeedPage() {
     .map(post => ({
     id: post.id,
     user: {
-      id: post.users!.id || '',
-      name: post.users!.name || 'Unknown User',
+      id: post.users.id || '',
+      name: post.users.name || 'Unknown User',
       avatar: {
-        imageUrl: post.users!.avatar_url || '',
+        imageUrl: post.users.avatar_url || '',
       }
     },
     song: {
-      id: post.songs!.id || '',
-      title: post.songs!.title || 'Unknown Song',
+      id: post.songs.id || '',
+      title: post.songs.title || 'Unknown Song',
       songUrl: '', // Not needed for feed card
       artist: {
         id: '', // Not available in this query
-        name: post.songs!.artists?.name || 'Unknown Artist',
+        name: post.songs.artists.name || 'Unknown Artist',
       },
       album: {
-        id: post.songs!.albums?.id || '',
-        title: post.songs!.albums?.title || '',
+        id: post.songs.albums.id || '',
+        title: post.songs.albums.title || '',
         coverArt: {
-          imageUrl: post.songs!.albums?.cover_art_url || '',
+          imageUrl: post.songs.albums.cover_art_url || '',
         },
       }
     },
@@ -47,30 +53,32 @@ export default async function FeedPage() {
 
   return (
     <MainLayout>
-      <div className="max-w-2xl mx-auto">
-        <div className="space-y-8">
-          <div>
-            <h1 className="text-4xl font-bold font-headline tracking-tight">
-              Social Feed
-            </h1>
-            <p className="text-muted-foreground">
-              See what your friends are listening to.
-            </p>
-          </div>
+      <div>
+        <div className="max-w-2xl mx-auto">
+          <div className="space-y-8">
+            <div>
+              <h1 className="text-4xl font-bold font-headline tracking-tight">
+                Social Feed
+              </h1>
+              <p className="text-muted-foreground">
+                See what your friends are listening to.
+              </p>
+            </div>
 
-          <div className="space-y-6">
-            {formattedPosts.length > 0 ? (
-              formattedPosts.map((post) => (
-                <FeedPostCard key={post.id} post={post} />
-              ))
-            ) : (
-              <div className="text-center py-10 border rounded-lg bg-card/50">
-                <p className="text-lg font-medium">Your feed is empty</p>
-                <p className="text-muted-foreground">
-                  Follow friends to see what they are listening to.
-                </p>
-              </div>
-            )}
+            <div className="space-y-6">
+              {formattedPosts.length > 0 ? (
+                formattedPosts.map((post) => (
+                  <FeedPostCard key={post.id} post={post} />
+                ))
+              ) : (
+                <div className="text-center py-10 border rounded-lg bg-card/50">
+                  <p className="text-lg font-medium">Your feed is empty</p>
+                  <p className="text-muted-foreground">
+                    Follow friends or check back later for new posts.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
