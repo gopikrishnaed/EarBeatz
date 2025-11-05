@@ -3,6 +3,37 @@
 import { createClient } from './server-client';
 import type { AlbumFromDB, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB } from '@/lib/types';
 
+// Placeholder song URLs for demonstration
+const placeholderSongs = [
+    'https://cdn.pixabay.com/download/audio/2022/12/22/audio_fb4b16e49e.mp3', // Lofi Chill
+    'https://cdn.pixabay.com/download/audio/2022/11/22/audio_15a8b13264.mp3', // Ambient Classical Guitar
+    'https://cdn.pixabay.com/download/audio/2022/08/04/audio_2dde64b97c.mp3', // Just Relax
+    'https://cdn.pixabay.com/download/audio/2024/04/24/audio_34902b97c7.mp3', // Upbeat Funk
+    'https://cdn.pixabay.com/download/audio/2023/04/18/audio_1c8898165b.mp3'  // Cinematic Emotional
+];
+
+function mapSongData(songData: SongFromDB, index: number): Song {
+    return {
+        id: songData.id,
+        title: songData.title,
+        songUrl: songData.song_url || placeholderSongs[index % placeholderSongs.length],
+        artist: {
+          id: songData.artists?.id || '',
+          name: songData.artists?.name || 'Unknown Artist'
+        },
+        album: {
+          id: songData.albums?.id || '',
+          title: songData.albums?.title || 'Unknown Album',
+          coverArt: {
+            imageUrl: songData.albums?.cover_art_url || ''
+          }
+        },
+        duration: songData.duration_in_seconds ? `${Math.floor(songData.duration_in_seconds / 60)}:${String(songData.duration_in_seconds % 60).padStart(2, '0')}` : '3:00',
+        metadata: songData.metadata as Song['metadata'] || {}
+    }
+}
+
+
 export async function getSongs(): Promise<Song[]> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -26,24 +57,7 @@ export async function getSongs(): Promise<Song[]> {
         return [];
     }
     
-    const songs: Song[] = (data as SongFromDB[]).map(s => ({
-        id: s.id,
-        title: s.title,
-        songUrl: s.song_url,
-        artist: {
-          id: s.artists?.id || '',
-          name: s.artists?.name || 'Unknown Artist'
-        },
-        album: {
-          id: s.albums?.id || '',
-          title: s.albums?.title || 'Unknown Album',
-          coverArt: {
-            imageUrl: s.albums?.cover_art_url || ''
-          }
-        },
-        duration: s.duration_in_seconds ? `${Math.floor(s.duration_in_seconds / 60)}:${String(s.duration_in_seconds % 60).padStart(2, '0')}` : '0:00',
-        metadata: s.metadata as Song['metadata'] || {}
-    }));
+    const songs: Song[] = (data as SongFromDB[]).map(mapSongData);
 
     return songs;
 }
@@ -66,7 +80,18 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
         console.error('Error fetching songs by album:', error);
         return [];
     }
-    return data || [];
+    
+    if (!data) {
+        return [];
+    }
+    
+    // Inject placeholder URLs if the song_url is null
+    const modifiedData = data.map((song, index) => ({
+        ...song,
+        song_url: song.song_url || placeholderSongs[index % placeholderSongs.length]
+    }));
+
+    return modifiedData || [];
 }
 
 export async function getAlbums(): Promise<AlbumFromDB[]> {
