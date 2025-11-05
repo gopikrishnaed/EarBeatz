@@ -29,7 +29,6 @@ const NAV_ITEMS = [
   { href: "/discover", label: "Discover", icon: ListMusic },
   { href: "/generate", label: "Generate Playlist", icon: Sparkles },
   { href: "/feed", label: "Feed", icon: Users },
-  { href: "/supabase", label: "Supabase", icon: Database },
 ];
 
 export default function MainSidebar() {
