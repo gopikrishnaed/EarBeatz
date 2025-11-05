@@ -11,7 +11,7 @@ export function FeedPostCard({ post }: { post: FeedPost }) {
       <CardHeader>
         <div className="flex items-center gap-4">
           <Avatar>
-            <AvatarImage src={post.user.avatar.imageUrl} alt={post.user.name} data-ai-hint={post.user.avatar.imageHint} />
+            <AvatarImage src={post.user.avatar?.imageUrl} alt={post.user.name} data-ai-hint={post.user.avatar?.imageHint} />
             <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
