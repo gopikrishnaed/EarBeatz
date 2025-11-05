@@ -1,15 +1,10 @@
 'use server';
 
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/lib/types/supabase';
+import { createClient } from './server-client';
 import type { AlbumFromDB, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB } from '@/lib/types';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
-
-
 export async function getSongs(): Promise<Song[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
         .from('songs')
         .select(`
@@ -55,6 +50,7 @@ export async function getSongs(): Promise<Song[]> {
 
 
 export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
         .from('songs')
         .select(`
@@ -74,6 +70,7 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
 }
 
 export async function getAlbums(): Promise<AlbumFromDB[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
         .from('albums')
         .select(`
@@ -89,6 +86,7 @@ export async function getAlbums(): Promise<AlbumFromDB[]> {
 }
 
 export async function getPlaylists(): Promise<PlaylistFromDB[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
         .from('playlists')
         .select(`
@@ -104,6 +102,7 @@ export async function getPlaylists(): Promise<PlaylistFromDB[]> {
 }
 
 export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
         .from('feed_posts')
         .select(`
