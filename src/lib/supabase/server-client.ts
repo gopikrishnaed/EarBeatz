@@ -1,5 +1,8 @@
 // IMPORTANT: This file is only used on the server.
 // See `client.ts` for the client-side Supabase client.
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/types/supabase';
 
@@ -10,7 +13,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  throw new Error('Missing Supabase URL or Service Role Key. Make sure to set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your .env file.');
+  throw new Error('Missing Supabase URL or Service Role Key. Make sure to set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your .env.local file.');
 }
 
 if (supabaseUrl === 'YOUR_SUPABASE_URL') {
