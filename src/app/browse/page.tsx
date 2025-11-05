@@ -1,13 +1,22 @@
 import MainLayout from "@/components/layout/main-layout";
 import { MusicCard } from "@/components/music-card";
-import { allMusic } from "@/lib/placeholder-data";
+import { getAlbums, getPlaylists } from "@/lib/supabase/queries";
+import type { MusicItem } from "@/lib/types";
 
 // Helper to get unique items by a key
 function getUniqueItems<T>(items: T[], key: keyof T): T[] {
   return [...new Map(items.map(item => [item[key], item])).values()];
 }
 
-export default function BrowsePage() {
+export default async function BrowsePage() {
+  const albums = await getAlbums();
+  const playlists = await getPlaylists();
+
+  const allMusic: MusicItem[] = [
+    ...albums.map(a => ({ id: a.id, type: 'album' as const, title: a.title, creator: a.artists?.name || 'Unknown', coverArt: { imageUrl: a.cover_art_url || '' } })),
+    ...playlists.map(p => ({ id: p.id, type: 'playlist' as const, title: p.title, creator: p.users?.name || 'Unknown', coverArt: { imageUrl: p.cover_art_url || '' } }))
+  ]
+
   const uniqueMusic = getUniqueItems(allMusic, 'id');
   const newReleases = [...uniqueMusic].sort(() => 0.5 - Math.random()).slice(0, 6);
   const topCharts = [...uniqueMusic].sort(() => 0.5 - Math.random()).slice(0, 6);

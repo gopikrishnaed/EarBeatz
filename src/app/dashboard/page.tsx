@@ -1,8 +1,21 @@
 import MainLayout from "@/components/layout/main-layout";
 import { MusicCard } from "@/components/music-card";
-import { madeForYou, recentlyPlayed } from "@/lib/placeholder-data";
+import { getAlbums } from "@/lib/supabase/queries";
+import type { MusicItem } from "@/lib/types";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const albums = await getAlbums();
+  const musicItems: MusicItem[] = albums.map(a => ({
+    id: a.id,
+    type: 'album',
+    title: a.title,
+    creator: a.artists?.name || 'Unknown Artist',
+    coverArt: { imageUrl: a.cover_art_url || '' }
+  }));
+
+  const madeForYou = [...musicItems].sort(() => 0.5 - Math.random()).slice(0, 6);
+  const recentlyPlayed = [...musicItems].sort(() => 0.5 - Math.random()).slice(0, 6);
+  
   return (
     <MainLayout>
       <div className="space-y-8">

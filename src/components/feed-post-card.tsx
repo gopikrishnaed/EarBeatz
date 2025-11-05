@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { FeedPost } from "@/lib/placeholder-data";
+import type { FeedPost } from "@/lib/types";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
@@ -11,7 +11,7 @@ export function FeedPostCard({ post }: { post: FeedPost }) {
       <CardHeader>
         <div className="flex items-center gap-4">
           <Avatar>
-            <AvatarImage src={post.user.avatar?.imageUrl} alt={post.user.name} data-ai-hint={post.user.avatar?.imageHint} />
+            <AvatarImage src={post.user.avatar?.imageUrl} alt={post.user.name} />
             <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
@@ -29,7 +29,6 @@ export function FeedPostCard({ post }: { post: FeedPost }) {
             width={64}
             height={64}
             className="rounded-md object-cover"
-            data-ai-hint={post.song.album.coverArt.imageHint}
           />
           <div>
             <p className="font-semibold">{post.song.title}</p>

@@ -1,8 +1,18 @@
 import MainLayout from "@/components/layout/main-layout";
 import { MusicCard } from "@/components/music-card";
-import { allMusic } from "@/lib/placeholder-data";
+import { getAlbums } from "@/lib/supabase/queries";
+import type { MusicItem } from "@/lib/types";
 
-export default function DiscoverPage() {
+export default async function DiscoverPage() {
+  const albums = await getAlbums();
+  const allMusic: MusicItem[] = albums.map(a => ({
+    id: a.id,
+    type: 'album',
+    title: a.title,
+    creator: a.artists?.name || 'Unknown Artist',
+    coverArt: { imageUrl: a.cover_art_url || '' }
+  }));
+
   const trending = [...allMusic].sort(() => 0.5 - Math.random()).slice(0, 12);
   const recommendations = [...allMusic].sort(() => 0.5 - Math.random()).slice(0, 6);
 
@@ -27,7 +37,7 @@ export default function DiscoverPage() {
 
         <section>
           <h2 className="text-2xl font-semibold font-headline mb-4">Personalized Recommendations</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm//grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {recommendations.map((item) => (
               <MusicCard key={item.id} item={item} />
             ))}

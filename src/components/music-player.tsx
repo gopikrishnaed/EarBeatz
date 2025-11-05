@@ -13,9 +13,11 @@ export function MusicPlayer() {
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(0.5);
   const [isMuted, setIsMuted] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef.current && currentSong) {
       if (isPlaying) {
         audioRef.current.play().catch(e => console.error("Playback failed", e));
       } else {
@@ -32,10 +34,17 @@ export function MusicPlayer() {
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
       setProgress((audioRef.current.currentTime / audioRef.current.duration) * 100);
     }
   };
   
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  }
+
   const handleSeek = (value: number[]) => {
     if (audioRef.current) {
       audioRef.current.currentTime = (value[0] / 100) * audioRef.current.duration;
@@ -53,6 +62,7 @@ export function MusicPlayer() {
   }
 
   const formatTime = (seconds: number) => {
+    if (isNaN(seconds) || seconds === 0) return '0:00';
     const minutes = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
@@ -68,17 +78,18 @@ export function MusicPlayer() {
         ref={audioRef}
         src={currentSong.songUrl}
         onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
         onEnded={nextSong}
+        key={currentSong.id} // Important: force re-render on song change
       />
       <div className="container mx-auto p-3 flex items-center justify-between">
         <div className="flex items-center gap-4 w-1/4">
           <Image
-            src={currentSong.album.coverArt.imageUrl}
+            src={currentSong.album.coverArt.imageUrl || `https://picsum.photos/seed/${currentSong.album.id}/56/56`}
             alt={currentSong.album.title}
             width={56}
             height={56}
             className="rounded-md object-cover"
-            data-ai-hint={currentSong.album.coverArt.imageHint}
           />
           <div>
             <p className="font-semibold truncate">{currentSong.title}</p>
@@ -88,26 +99,26 @@ export function MusicPlayer() {
 
         <div className="flex flex-col items-center gap-2 w-1/2">
             <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" onClick={prevSong}>
+                <Button variant="ghost" size="icon" onClick={prevSong} disabled={!prevSong}>
                     <SkipBack className="w-5 h-5" />
                 </Button>
                 <Button variant="default" size="icon" className="w-12 h-12 rounded-full" onClick={isPlaying ? pauseSong : () => playSong(currentSong)}>
                     {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current" />}
                 </Button>
-                <Button variant="ghost" size="icon" onClick={nextSong}>
+                <Button variant="ghost" size="icon" onClick={nextSong} disabled={!nextSong}>
                     <SkipForward className="w-5 h-5" />
                 </Button>
             </div>
             <div className="flex items-center gap-2 w-full">
-                <span className="text-xs text-muted-foreground">{audioRef.current ? formatTime(audioRef.current.currentTime) : '0:00'}</span>
+                <span className="text-xs text-muted-foreground">{formatTime(currentTime)}</span>
                 <Slider
-                    value={[progress]}
+                    value={[progress || 0]}
                     max={100}
                     step={1}
                     onValueChange={handleSeek}
                     className="w-full"
                 />
-                <span className="text-xs text-muted-foreground">{audioRef.current ? formatTime(audioRef.current.duration) : '0:00'}</span>
+                <span className="text-xs text-muted-foreground">{formatTime(duration)}</span>
             </div>
         </div>
 
