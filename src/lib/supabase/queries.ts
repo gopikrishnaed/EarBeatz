@@ -1,7 +1,12 @@
 'use server';
 
-import { supabase } from './server-client';
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/lib/types/supabase';
 import type { AlbumFromDB, FeedPostFromDB, PlaylistFromDB, SongFromDB } from '@/lib/types';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
 
 export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
     const { data, error } = await supabase
