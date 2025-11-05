@@ -119,8 +119,8 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
             songs (
                 id,
                 title,
-                artists ( name ),
-                albums ( id, title, cover_art_url )
+                artists:artist_id ( name ),
+                albums:album_id ( id, title, cover_art_url )
             ),
             likes ( user_id ),
             comments ( id )
