@@ -4,11 +4,31 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import type { MusicItem } from "@/lib/types";
+import type { MusicItem, Song } from "@/lib/types";
 import { useMusicPlayer } from "@/context/music-player-context";
 import { Play } from "lucide-react";
 import { getSongsByAlbum, getSongsByPlaylist } from "@/lib/supabase/queries";
 import { Button } from "./ui/button";
+
+function mapSongData(songData: any, albumInfo: any): Song {
+  return {
+    id: songData.id,
+    title: songData.title,
+    songUrl: songData.song_url || '',
+    artist: {
+      id: albumInfo.artist?.id || '',
+      name: albumInfo.artist?.name || 'Unknown Artist'
+    },
+    album: {
+      id: albumInfo.id,
+      title: albumInfo.title
+    },
+    coverArt: {
+      imageUrl: songData.cover_art_song || ''
+    },
+    duration: songData.duration_in_seconds ? `${Math.floor(songData.duration_in_seconds / 60)}:${String(songData.duration_in_seconds % 60).padStart(2, '0')}` : '3:00'
+  };
+}
 
 export function MusicCard({ item }: { item: MusicItem }) {
   const { playSong } = useMusicPlayer();
@@ -18,25 +38,17 @@ export function MusicCard({ item }: { item: MusicItem }) {
     e.preventDefault();
     
     if (item.type === 'album') {
-      const songs = await getSongsByAlbum(item.id);
-      if (songs && songs.length > 0) {
-        const mappedSongs = songs.map(song => ({
-          id: song.id,
-          title: song.title,
-          songUrl: song.song_url || '',
+      const songsFromDb = await getSongsByAlbum(item.id);
+      if (songsFromDb && songsFromDb.length > 0) {
+        const albumInfoForSongs = {
+          id: songsFromDb[0].album_id,
+          title: songsFromDb[0].albums?.title,
           artist: {
-            id: song.artists?.id || '',
-            name: song.artists?.name || 'Unknown Artist'
-          },
-          album: {
-            id: song.albums?.id || '',
-            title: song.albums?.title || 'Unknown Album',
-          },
-          coverArt: {
-            imageUrl: song.cover_art_song || ''
-          },
-          duration: song.duration_in_seconds ? `${Math.floor(song.duration_in_seconds / 60)}:${String(song.duration_in_seconds % 60).padStart(2, '0')}` : '3:00'
-        }));
+            id: songsFromDb[0].artists?.id,
+            name: songsFromDb[0].artists?.name
+          }
+        }
+        const mappedSongs = songsFromDb.map(song => mapSongData(song, albumInfoForSongs));
         playSong(mappedSongs[0], mappedSongs);
       }
     } else if (item.type === 'playlist') {

@@ -19,7 +19,7 @@ function mapSongData(songData: SongFromDB): Song {
     return {
         id: songData.id,
         title: songData.title,
-        songUrl: songData.song_url || '', // Use the URL from DB or an empty string
+        songUrl: songData.song_url || '', // Correctly map song_url
         artist: {
           id: songData.artists?.id || '',
           name: songData.artists?.name || 'Unknown Artist'
@@ -77,6 +77,7 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
             song_url,
             duration_in_seconds,
             cover_art_song,
+            album_id,
             artists ( id, name ),
             albums ( id, title )
         `)
