@@ -6,41 +6,34 @@ import { formatDistanceToNow } from 'date-fns';
 import type { FeedPost, FeedPostFromDB, Song, UserFromDB } from "@/lib/types";
 import { CreatePostForm } from "@/components/create-post-form";
 
-// Type guard to check if a post has the minimum required data
-function isValidPost(post: FeedPostFromDB): post is FeedPostFromDB & { users: NonNullable<FeedPostFromDB['users']>, songs: NonNullable<FeedPostFromDB['songs']> & { artists: NonNullable<FeedPostFromDB['songs']['artists']> } } {
-  return !!(post && post.users && post.songs && post.songs.artists);
-}
-
-
 export default async function FeedPage() {
   const posts = await getFeedPosts();
   const songs = await getSongs();
 
   const formattedPosts: FeedPost[] = posts
-    .filter(isValidPost)
     .map(post => ({
     id: post.id,
     user: {
-      id: post.users.id || '',
-      name: post.users.name || 'Unknown User',
+      id: post.users?.id || '',
+      name: post.users?.name || 'Unknown User',
       avatar: {
-        imageUrl: post.users.avatar_url || '',
+        imageUrl: post.users?.avatar_url || '',
       }
     },
     song: {
-      id: post.songs.id || '',
-      title: post.songs.title || 'Unknown Song',
-      songUrl: post.songs.song_url || '',
+      id: post.songs?.id || '',
+      title: post.songs?.title || 'Unknown Song',
+      songUrl: post.songs?.song_url || '',
       artist: {
-        id: post.songs.artists?.id || '',
-        name: post.songs.artists?.name || 'Unknown Artist',
+        id: post.songs?.artists?.id || '',
+        name: post.songs?.artists?.name || 'Unknown Artist',
       },
       album: {
-        id: post.songs.album_id || '',
-        title: post.songs.albums?.title || 'Unknown Album',
+        id: post.songs?.album_id || '',
+        title: post.songs?.albums?.title || 'Unknown Album',
       },
       coverArt: {
-        imageUrl: post.songs.cover_art_song || ''
+        imageUrl: post.songs?.cover_art_song || ''
       },
     } as Song,
     content: post.content || '',

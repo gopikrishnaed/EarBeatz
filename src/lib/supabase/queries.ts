@@ -1,7 +1,4 @@
 
-
-
-
 'use server';
 
 import { createClient as createServerClient } from './server-client';
@@ -40,13 +37,17 @@ function mapSongData(songData: SongFromDB): Song {
     }
 }
 
-
 export async function getSongs(): Promise<Song[]> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('songs')
         .select(`
-            *,
+            id,
+            title,
+            song_url,
+            cover_art_song,
+            duration_in_seconds,
+            metadata,
             artists ( id, name ),
             albums ( id, title )
         `);
@@ -60,7 +61,7 @@ export async function getSongs(): Promise<Song[]> {
         return [];
     }
     
-    const songs: Song[] = (data as SongFromDB[]).map(mapSongData);
+    const songs: Song[] = (data as unknown as SongFromDB[]).map(mapSongData);
 
     return songs;
 }
