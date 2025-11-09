@@ -43,7 +43,7 @@ export default async function AlbumDetailPage({ params }: { params: { id: string
   }
   
   const songs: Song[] = songsFromDb.map(song => mapSongData(song as SongFromDB, album));
-  const albumCoverUrl = songs.length > 0 && songs[0].coverArt.imageUrl ? songs[0].coverArt.imageUrl : `https://picsum.photos/seed/${album.id}/600/600`;
+  const albumCoverUrl = songs.length > 0 && songs[0].coverArt.imageUrl ? songs[0].coverArt.imageUrl : (album as any).coverArtUrl || `https://picsum.photos/seed/${album.id}/600/600`;
 
 
   return (

@@ -1,5 +1,4 @@
 
-
 'use server';
 
 import { createClient as createServerClient } from './server-client';
@@ -154,11 +153,9 @@ export async function getAlbumsWithCoverArt(): Promise<AlbumWithCoverArt[]> {
     if (!data) return [];
 
     const albumsWithCovers = data.map(album => {
-        // Find the first song in the album that has a cover art URL
         const firstSongWithCover = album.songs.find(song => song.cover_art_song);
         return {
             ...album,
-            // Use that song's cover art, or null if no songs have cover art
             coverArtUrl: firstSongWithCover?.cover_art_song || null,
         };
     });
