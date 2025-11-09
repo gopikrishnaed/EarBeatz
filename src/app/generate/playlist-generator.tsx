@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -34,7 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import { ListMusic, Loader2, Music, Play, Save, ServerCrash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMusicPlayer } from "@/context/music-player-context";
@@ -161,9 +162,20 @@ export function PlaylistGenerator({ moods }: { moods: string[] }) {
                 name="playlistLength"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Number of Songs</FormLabel>
+                    <div className="flex justify-between items-center">
+                      <FormLabel>Number of Songs</FormLabel>
+                      <span className="text-sm font-medium w-12 text-center bg-primary/10 text-primary rounded-md px-2 py-1">
+                        {field.value}
+                      </span>
+                    </div>
                     <FormControl>
-                      <Input type="number" min="5" max="20" {...field} />
+                      <Slider
+                        min={5}
+                        max={20}
+                        step={1}
+                        value={[field.value]}
+                        onValueChange={(value) => field.onChange(value[0])}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
