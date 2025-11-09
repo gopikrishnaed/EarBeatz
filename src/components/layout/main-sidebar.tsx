@@ -60,7 +60,12 @@ export default function MainSidebar() {
                 >
                   <Link href={item.disabled ? "#" : item.href} tabIndex={item.disabled ? -1 : undefined}>
                     {item.disabled && item.lockIcon ? <item.lockIcon /> : <item.icon />}
-                    <span>{item.label}</span>
+                    <span className="flex-1">{item.label}</span>
+                    {item.disabled && (
+                      <span className="text-xs bg-muted text-muted-foreground font-medium rounded-full px-2 py-0.5">
+                        Soon
+                      </span>
+                    )}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
