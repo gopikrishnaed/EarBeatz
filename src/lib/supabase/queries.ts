@@ -19,7 +19,7 @@ function mapSongData(songData: SongFromDB): Song {
     return {
         id: songData.id,
         title: songData.title,
-        songUrl: songData.song_url || '', // Correctly map song_url
+        songUrl: songData.song_url || '',
         artist: {
           id: songData.artists?.id || '',
           name: songData.artists?.name || 'Unknown Artist'
