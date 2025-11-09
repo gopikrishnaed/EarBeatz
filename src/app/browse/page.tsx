@@ -19,7 +19,7 @@ export default async function BrowsePage() {
 
   return (
     <MainLayout>
-      <div>
+      <div className="max-w-7xl mx-auto">
         <div className="space-y-8">
           <div>
             <h1 className="text-4xl font-bold font-headline tracking-tight">Browse Playlists</h1>

@@ -5,9 +5,10 @@ import { formatDistanceToNow } from 'date-fns';
 import type { FeedPost, FeedPostFromDB } from "@/lib/types";
 
 // Type guard to check if a post has the minimum required data
-function isValidPost(post: FeedPostFromDB): post is FeedPostFromDB & { users: NonNullable<FeedPostFromDB['users']>, songs: NonNullable<FeedPostFromDB['songs']> } {
-  return !!(post && post.users && post.songs);
+function isValidPost(post: FeedPostFromDB): post is FeedPostFromDB & { users: NonNullable<FeedPostFromDB['users']>, songs: NonNullable<FeedPostFromDB['songs']> & { artists: NonNullable<FeedPostFromDB['songs']['artists']>, albums: NonNullable<FeedPostFromDB['songs']['albums']> } } {
+  return !!(post && post.users && post.songs && post.songs.artists && post.songs.albums);
 }
+
 
 export default async function FeedPage() {
   const posts = await getFeedPosts();
@@ -29,13 +30,13 @@ export default async function FeedPage() {
       songUrl: '', // Not needed for feed card
       artist: {
         id: '', // Not available in simplified query
-        name: post.songs.artists?.name || 'Unknown Artist', // Safely access artist
+        name: post.songs.artists.name || 'Unknown Artist', // Safely access artist
       },
       album: {
-        id: post.songs.albums?.id || '', // Safely access album
-        title: post.songs.albums?.title || '',
+        id: post.songs.albums.id || '', // Safely access album
+        title: post.songs.albums.title || '',
         coverArt: {
-          imageUrl: post.songs.albums?.cover_art_url || '',
+          imageUrl: post.songs.albums.cover_art_url || '',
         },
       }
     },

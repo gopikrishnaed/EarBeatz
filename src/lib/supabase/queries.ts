@@ -1,7 +1,18 @@
 'use server';
 
-import { createClient } from './server-client';
+import { createClient as createServerClient } from './server-client';
+import { createClient as createBrowserClient } from './client';
 import type { AlbumFromDB, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB } from '@/lib/types';
+
+// Use a client that doesn't rely on the cookie store for server-side queries
+// to avoid issues with Next.js server component rendering.
+const getSupabaseClient = () => {
+  if (typeof window === 'undefined') {
+    return createServerClient();
+  }
+  return createBrowserClient();
+}
+
 
 function mapSongData(songData: SongFromDB): Song {
     return {
@@ -26,7 +37,7 @@ function mapSongData(songData: SongFromDB): Song {
 
 
 export async function getSongs(): Promise<Song[]> {
-    const supabase = createClient();
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('songs')
         .select(`
@@ -55,7 +66,7 @@ export async function getSongs(): Promise<Song[]> {
 
 
 export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
-    const supabase = createClient();
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('songs')
         .select(`
@@ -77,7 +88,7 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
 }
 
 export async function getSongsByPlaylist(playlistId: string): Promise<Song[]> {
-    const supabase = createClient();
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('playlist_songs')
         .select(`
@@ -103,7 +114,7 @@ export async function getSongsByPlaylist(playlistId: string): Promise<Song[]> {
 }
 
 export async function getAlbumById(albumId: string): Promise<AlbumFromDB | null> {
-    const supabase = createClient();
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('albums')
         .select(`
@@ -121,7 +132,7 @@ export async function getAlbumById(albumId: string): Promise<AlbumFromDB | null>
 }
 
 export async function getAlbums(): Promise<AlbumFromDB[]> {
-    const supabase = createClient();
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('albums')
         .select(`
@@ -137,7 +148,7 @@ export async function getAlbums(): Promise<AlbumFromDB[]> {
 }
 
 export async function getPlaylists(): Promise<PlaylistFromDB[]> {
-    const supabase = createClient();
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('playlists')
         .select(`
@@ -153,7 +164,7 @@ export async function getPlaylists(): Promise<PlaylistFromDB[]> {
 }
 
 export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
-    const supabase = createClient();
+    const supabase = getSupabaseClient();
     
     const { data, error } = await supabase
         .from('feed_posts')
@@ -177,7 +188,38 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
         console.error('Error fetching feed posts:', error);
         return [];
     }
-    return data || [];
+
+    const postsWithDetails = await Promise.all(
+        (data || []).map(async (post) => {
+            if (!post.songs) return post;
+
+            const { data: artistData, error: artistError } = await supabase
+                .from('artists')
+                .select('name')
+                .eq('id', post.songs.artist_id || '')
+                .single();
+
+            const { data: albumData, error: albumError } = await supabase
+                .from('albums')
+                .select('id, title, cover_art_url')
+                .eq('id', post.songs.album_id || '')
+                .single();
+
+            if (artistError) console.error('Artist fetch error:', artistError.message);
+            if (albumError) console.error('Album fetch error:', albumError.message);
+
+            return {
+                ...post,
+                songs: {
+                    ...post.songs,
+                    artists: artistData || { name: 'Unknown Artist' },
+                    albums: albumData || { id: '', title: 'Unknown Album', cover_art_url: '' }
+                }
+            };
+        })
+    );
+
+    return postsWithDetails as FeedPostFromDB[];
 }
 
 
@@ -187,7 +229,7 @@ export async function savePlaylist(
     songs: Song[],
     coverArtUrl?: string | null
 ): Promise<{ success: boolean; error?: string }> {
-    const supabase = createClient();
+    const supabase = getSupabaseClient();
 
     // Step 1: Create the new playlist
     const { data: playlistData, error: playlistError } = await supabase

@@ -31,7 +31,7 @@ export default async function DiscoverPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         <div>
           <h1 className="text-4xl font-bold font-headline tracking-tight">Discover</h1>
           <p className="text-muted-foreground">

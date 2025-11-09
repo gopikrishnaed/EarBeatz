@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import { getAlbumById, getSongsByAlbum } from "@/lib/supabase/queries";
 import MainLayout from "@/components/layout/main-layout";
@@ -46,7 +47,7 @@ export default async function AlbumDetailPage({ params }: { params: { id: string
 
   return (
     <MainLayout>
-      <div className="flex flex-col md:flex-row items-start gap-8">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start gap-8">
         <div className="w-full md:w-1/3">
           <div className="aspect-square relative shadow-lg">
             <Image

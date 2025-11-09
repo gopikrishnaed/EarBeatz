@@ -1,3 +1,4 @@
+
 import MainLayout from "@/components/layout/main-layout";
 import { SongItem } from "@/components/song-item";
 import { getSongs } from "@/lib/supabase/queries";
@@ -31,7 +32,7 @@ export default async function DashboardPage() {
   
   return (
     <MainLayout>
-      <div className="space-y-12">
+      <div className="max-w-7xl mx-auto space-y-12">
         <div>
           <h1 className="text-4xl font-bold font-headline tracking-tight">
             Welcome Back

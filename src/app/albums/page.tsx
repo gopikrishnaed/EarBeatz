@@ -1,3 +1,4 @@
+
 import MainLayout from "@/components/layout/main-layout";
 import { MusicCard } from "@/components/music-card";
 import { getAlbums } from "@/lib/supabase/queries";
@@ -15,7 +16,7 @@ export default async function AlbumsPage() {
 
   return (
     <MainLayout>
-      <div className="space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         <div>
           <h1 className="text-4xl font-bold font-headline tracking-tight">
             Albums
