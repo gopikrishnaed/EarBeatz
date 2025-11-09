@@ -1,9 +1,10 @@
 
 import MainLayout from "@/components/layout/main-layout";
 import { FeedPostCard } from "@/components/feed-post-card";
-import { getFeedPosts } from "@/lib/supabase/queries";
+import { getFeedPosts, getSongs } from "@/lib/supabase/queries";
 import { formatDistanceToNow } from 'date-fns';
-import type { FeedPost, FeedPostFromDB, Song } from "@/lib/types";
+import type { FeedPost, FeedPostFromDB, Song, UserFromDB } from "@/lib/types";
+import { CreatePostForm } from "@/components/create-post-form";
 
 // Type guard to check if a post has the minimum required data
 function isValidPost(post: FeedPostFromDB): post is FeedPostFromDB & { users: NonNullable<FeedPostFromDB['users']>, songs: NonNullable<FeedPostFromDB['songs']> & { artists: NonNullable<FeedPostFromDB['songs']['artists']> } } {
@@ -13,6 +14,7 @@ function isValidPost(post: FeedPostFromDB): post is FeedPostFromDB & { users: No
 
 export default async function FeedPage() {
   const posts = await getFeedPosts();
+  const songs = await getSongs();
 
   const formattedPosts: FeedPost[] = posts
     .filter(isValidPost)
@@ -35,7 +37,7 @@ export default async function FeedPage() {
       },
       album: {
         id: post.songs.album_id || '',
-        title: 'Unknown Album',
+        title: post.songs.albums?.title || 'Unknown Album',
       },
       coverArt: {
         imageUrl: post.songs.cover_art_song || ''
@@ -47,6 +49,15 @@ export default async function FeedPage() {
     timestamp: post.created_at ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true }) : 'just now',
   }));
 
+  // Hardcoded user for now, in a real app this would come from auth
+  const currentUser: UserFromDB = {
+    id: 'f5e4b3a2-1c9d-4f38-9a6b-7b8c9d0e1f2a',
+    name: 'Jane Doe',
+    email: 'jane.doe@example.com',
+    created_at: new Date().toISOString(),
+    avatar_url: 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwZXJzb24lMjBzbWlsaW5nfGVufDB8fHx8MTc1OTEyNDY1Nnww&ixlib=rb-4.1.0&q=80&w=1080',
+  }
+
   return (
     <MainLayout>
       <div className="max-w-2xl mx-auto">
@@ -56,9 +67,11 @@ export default async function FeedPage() {
               Social Feed
             </h1>
             <p className="text-muted-foreground">
-              See what your friends are listening to.
+              See what your friends are listening to and share your own tunes.
             </p>
           </div>
+
+          <CreatePostForm songs={songs} user={currentUser} />
 
           <div className="space-y-6">
             {formattedPosts.length > 0 ? (

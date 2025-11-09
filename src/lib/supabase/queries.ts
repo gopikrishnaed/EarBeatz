@@ -1,10 +1,11 @@
 
 
+
 'use server';
 
 import { createClient as createServerClient } from './server-client';
 import { createClient as createBrowserClient } from './client';
-import type { AlbumFromDB, AlbumWithCoverArt, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB } from '@/lib/types';
+import type { AlbumFromDB, AlbumWithCoverArt, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB, FeedPostInsert } from '@/lib/types';
 
 // Use a client that doesn't rely on the cookie store for server-side queries
 // to avoid issues with Next.js server component rendering.
@@ -64,13 +65,14 @@ export async function getSongs(): Promise<Song[]> {
 }
 
 
-export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
+export async function getSongsByAlbum(albumId: string): Promise<Song[]> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('songs')
         .select(`
             *,
-            artists ( id, name )
+            artists ( id, name ),
+            albums ( id, title )
         `)
         .eq('album_id', albumId);
 
@@ -79,7 +81,7 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
         return [];
     }
     
-    return data || [];
+    return data.map(mapSongData) || [];
 }
 
 export async function getSongsByPlaylist(playlistId: string): Promise<Song[]> {
@@ -209,6 +211,21 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
     }
 
     return (data as FeedPostFromDB[]) || [];
+}
+
+export async function createFeedPost(
+    post: FeedPostInsert
+): Promise<{ success: boolean; error?: string }> {
+    const supabase = getSupabaseClient();
+
+    const { error } = await supabase.from('feed_posts').insert(post);
+
+    if (error) {
+        console.error('Error creating feed post:', error.message);
+        return { success: false, error: error.message };
+    }
+
+    return { success: true };
 }
 
 
