@@ -43,12 +43,7 @@ export async function getSongs(): Promise<Song[]> {
     const { data, error } = await supabase
         .from('songs')
         .select(`
-            id,
-            title,
-            song_url,
-            duration_in_seconds,
-            metadata,
-            cover_art_song,
+            *,
             artists ( id, name ),
             albums ( id, title )
         `);
@@ -73,13 +68,7 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
     const { data, error } = await supabase
         .from('songs')
         .select(`
-            id,
-            title,
-            song_url,
-            duration_in_seconds,
-            cover_art_song,
-            metadata,
-            album_id,
+            *,
             artists ( id, name )
         `)
         .eq('album_id', albumId);
@@ -98,12 +87,7 @@ export async function getSongsByPlaylist(playlistId: string): Promise<Song[]> {
         .from('playlist_songs')
         .select(`
             songs (
-                id,
-                title,
-                song_url,
-                duration_in_seconds,
-                metadata,
-                cover_art_song,
+                *,
                 artists ( id, name ),
                 albums ( id, title )
             )
@@ -217,11 +201,8 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
             created_at,
             users ( id, name, avatar_url ),
             songs ( 
-                id, 
-                title,
-                artist_id,
-                album_id,
-                cover_art_song
+                *,
+                artists ( name )
             ), 
             likes ( user_id ),
             comments ( id )
@@ -233,29 +214,7 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
         return [];
     }
 
-    const postsWithDetails = await Promise.all(
-        (data || []).map(async (post) => {
-            if (!post.songs) return post;
-
-            const { data: artistData, error: artistError } = await supabase
-                .from('artists')
-                .select('name')
-                .eq('id', post.songs.artist_id || '')
-                .single();
-
-            if (artistError) console.error('Artist fetch error:', artistError.message);
-
-            return {
-                ...post,
-                songs: {
-                    ...post.songs,
-                    artists: artistData || { name: 'Unknown Artist' },
-                }
-            };
-        })
-    );
-
-    return postsWithDetails as FeedPostFromDB[];
+    return (data as FeedPostFromDB[]) || [];
 }
 
 

@@ -3,7 +3,7 @@ import MainLayout from "@/components/layout/main-layout";
 import { FeedPostCard } from "@/components/feed-post-card";
 import { getFeedPosts } from "@/lib/supabase/queries";
 import { formatDistanceToNow } from 'date-fns';
-import type { FeedPost, FeedPostFromDB } from "@/lib/types";
+import type { FeedPost, FeedPostFromDB, Song } from "@/lib/types";
 
 // Type guard to check if a post has the minimum required data
 function isValidPost(post: FeedPostFromDB): post is FeedPostFromDB & { users: NonNullable<FeedPostFromDB['users']>, songs: NonNullable<FeedPostFromDB['songs']> & { artists: NonNullable<FeedPostFromDB['songs']['artists']> } } {
@@ -28,19 +28,19 @@ export default async function FeedPage() {
     song: {
       id: post.songs.id || '',
       title: post.songs.title || 'Unknown Song',
-      songUrl: '', // Not needed for feed card
+      songUrl: post.songs.song_url || '',
       artist: {
-        id: '', // Not available in simplified query
-        name: post.songs.artists.name || 'Unknown Artist', // Safely access artist
+        id: post.songs.artists?.id || '',
+        name: post.songs.artists?.name || 'Unknown Artist',
       },
       album: {
-        id: post.songs.album_id || '', 
-        title: '', // Not available
+        id: post.songs.album_id || '',
+        title: 'Unknown Album',
       },
       coverArt: {
         imageUrl: post.songs.cover_art_song || ''
-      }
-    },
+      },
+    } as Song,
     content: post.content || '',
     likes: post.likes?.length || 0,
     comments: post.comments?.length || 0,

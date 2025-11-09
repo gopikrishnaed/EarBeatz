@@ -69,7 +69,7 @@ export type AlbumFromDB = Database['public']['Tables']['albums']['Row'] & {
 };
 export type AlbumWithCoverArt = AlbumFromDB & { coverArtUrl: string | null };
 
-export type SongFromDB = Database['public']['Tables']['songs']['Row'] & {
+export type SongFromDB = Omit<Database['public']['Tables']['songs']['Row'], 'artist_id' | 'album_id'> & {
   artists: { id: string; name: string; } | null;
   albums: { id: string; title: string; } | null;
 };
@@ -79,16 +79,9 @@ export type PlaylistFromDB = Database['public']['Tables']['playlists']['Row'] & 
 };
 export type FeedPostFromDB = Omit<Database['public']['Tables']['feed_posts']['Row'], 'user_id' | 'song_id'> & {
   users: { id: string, name: string, avatar_url: string | null } | null;
-  songs: {
-    id: string,
-    title: string,
-    artist_id: string | null,
-    album_id: string | null,
-    cover_art_song: string | null,
+  songs: (Omit<SongFromDB, 'albums'> & {
     artists: { name: string } | null,
-  } | null;
+  }) | null;
   likes: { user_id: string }[];
   comments: { id: string }[];
 }
-
-    
