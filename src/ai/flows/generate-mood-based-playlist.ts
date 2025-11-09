@@ -33,9 +33,9 @@ const SongSchema = z.object({
   album: z.object({
     id: z.string(),
     title: z.string(),
-    coverArt: z.object({
-      imageUrl: z.string(),
-    }),
+  }),
+  coverArt: z.object({
+    imageUrl: z.string(),
   }),
   songUrl: z.string(),
   duration: z.string().optional(),
