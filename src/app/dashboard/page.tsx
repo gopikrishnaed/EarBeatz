@@ -1,50 +1,39 @@
 import MainLayout from "@/components/layout/main-layout";
-import { MusicCard } from "@/components/music-card";
-import { getAlbums } from "@/lib/supabase/queries";
-import type { MusicItem } from "@/lib/types";
+import { SongItem } from "@/components/song-item";
+import { getSongs } from "@/lib/supabase/queries";
+import type { Song } from "@/lib/types";
 
 export default async function DashboardPage() {
-  const albums = await getAlbums();
-  const musicItems: MusicItem[] = albums.map(a => ({
-    id: a.id,
-    type: 'album',
-    title: a.title,
-    creator: a.artists?.name || 'Unknown Artist',
-    coverArt: { imageUrl: a.cover_art_url || '' }
-  }));
+  const allSongs = await getSongs();
 
-  const madeForYou = [...musicItems].sort(() => 0.5 - Math.random()).slice(0, 6);
-  const recentlyPlayed = [...musicItems].sort(() => 0.5 - Math.random()).slice(0, 6);
+  const featuredSongs = [...allSongs].sort(() => 0.5 - Math.random()).slice(0, 10);
   
   return (
     <MainLayout>
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-4xl font-bold font-headline tracking-tight">
-            Good Afternoon
-          </h1>
-          <p className="text-muted-foreground">
-            Explore your favorite music, discover new tracks, and share your vibes.
-          </p>
+      <div>
+        <div className="space-y-8">
+          <div>
+            <h1 className="text-4xl font-bold font-headline tracking-tight">
+              Welcome Back
+            </h1>
+            <p className="text-muted-foreground">
+              Here are some tracks you might like.
+            </p>
+          </div>
+
+          <section>
+            <h2 className="text-2xl font-semibold font-headline mb-4">Featured Tracks</h2>
+            {featuredSongs.length > 0 ? (
+              <ul className="space-y-2">
+                  {featuredSongs.map((song) => (
+                      <SongItem key={song.id} song={song} playlist={allSongs} />
+                  ))}
+              </ul>
+              ) : (
+                  <p className="text-muted-foreground">No songs found in your library yet.</p>
+              )}
+          </section>
         </div>
-
-        <section>
-          <h2 className="text-2xl font-semibold font-headline mb-4">Made for you</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {madeForYou.map((item) => (
-              <MusicCard key={item.id} item={item} />
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold font-headline mb-4">Recently Played</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {recentlyPlayed.map((item) => (
-              <MusicCard key={item.id} item={item} />
-            ))}
-          </div>
-        </section>
       </div>
     </MainLayout>
   );
