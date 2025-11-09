@@ -76,6 +76,32 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
     return data || [];
 }
 
+export async function getSongsByPlaylist(playlistId: string): Promise<Song[]> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('playlist_songs')
+        .select(`
+            songs (
+                id,
+                title,
+                song_url,
+                duration_in_seconds,
+                metadata,
+                artists ( id, name ),
+                albums ( id, title, cover_art_url )
+            )
+        `)
+        .eq('playlist_id', playlistId);
+
+    if (error) {
+        console.error('Error fetching songs by playlist:', error);
+        return [];
+    }
+
+    const songData = data.map(item => item.songs).filter(Boolean) as SongFromDB[];
+    return songData.map(mapSongData);
+}
+
 export async function getAlbumById(albumId: string): Promise<AlbumFromDB | null> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -138,9 +164,9 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
             users ( id, name, avatar_url ),
             songs ( 
                 id, 
-                title, 
-                artists ( name ),
-                albums ( id, title, cover_art_url )
+                title,
+                artist_id,
+                album_id
             ), 
             likes ( user_id ),
             comments ( id )

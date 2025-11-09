@@ -46,6 +46,7 @@ export type MusicItem = {
   title: string;
   creator: string;
   coverArt: ImagePlaceholder;
+  songs?: Song[]; // Optional: for client-side playlists like mixes
 }
 
 export type FeedPost = {
