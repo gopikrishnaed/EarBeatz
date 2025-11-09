@@ -2,12 +2,11 @@
 import Image from "next/image";
 import { getAlbumById, getSongsByAlbum } from "@/lib/supabase/queries";
 import MainLayout from "@/components/layout/main-layout";
-import { Play } from "lucide-react";
 import { PlayAllButton } from "@/components/play-all-button";
 import { SongItem } from "@/components/song-item";
 import type { Song, AlbumFromDB, SongFromDB } from "@/lib/types";
 
-function mapSongData(songData: SongFromDB): Song {
+function mapSongData(songData: SongFromDB, album: AlbumFromDB): Song {
   return {
       id: songData.id,
       title: songData.title,
@@ -17,8 +16,8 @@ function mapSongData(songData: SongFromDB): Song {
         name: songData.artists?.name || 'Unknown Artist'
       },
       album: {
-        id: songData.albums?.id || '',
-        title: songData.albums?.title || 'Unknown Album',
+        id: album.id,
+        title: album.title,
       },
       coverArt: {
         imageUrl: songData.cover_art_song || ''
@@ -43,7 +42,7 @@ export default async function AlbumDetailPage({ params }: { params: { id: string
     )
   }
   
-  const songs: Song[] = songsFromDb.map(mapSongData);
+  const songs: Song[] = songsFromDb.map(song => mapSongData(song, album));
   const albumCoverUrl = songs.length > 0 ? songs[Math.floor(Math.random() * songs.length)].coverArt.imageUrl : `https://picsum.photos/seed/${album.id}/600/600`;
 
 

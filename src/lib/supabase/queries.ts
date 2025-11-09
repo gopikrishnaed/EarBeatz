@@ -52,7 +52,7 @@ export async function getSongs(): Promise<Song[]> {
             albums ( id, title )
         `);
 
-    if (error) {
+    if (error && Object.keys(error).length > 0) {
         console.error('Error fetching songs:', error.message);
         return [];
     }
@@ -79,12 +79,11 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
             cover_art_song,
             metadata,
             album_id,
-            artists ( id, name ),
-            albums ( id, title )
+            artists ( id, name )
         `)
         .eq('album_id', albumId);
 
-    if (error) {
+    if (error && Object.keys(error).length > 0) {
         console.error('Error fetching songs by album:', error);
         return [];
     }
@@ -309,5 +308,3 @@ export async function savePlaylist(
 
     return { success: true };
 }
-
-    
