@@ -1,17 +1,17 @@
 
 import MainLayout from "@/components/layout/main-layout";
 import { MusicCard } from "@/components/music-card";
-import { getAlbums } from "@/lib/supabase/queries";
+import { getAlbumsWithCoverArt } from "@/lib/supabase/queries";
 import type { MusicItem } from "@/lib/types";
 
 export default async function AlbumsPage() {
-  const albums = await getAlbums();
+  const albums = await getAlbumsWithCoverArt();
   const musicItems: MusicItem[] = albums.map(a => ({
     id: a.id,
     type: 'album',
     title: a.title,
     creator: a.artists?.name || 'Unknown Artist',
-    coverArt: { imageUrl: a.cover_art_url || '' }
+    coverArt: { imageUrl: a.coverArtUrl || '' }
   }));
 
   return (

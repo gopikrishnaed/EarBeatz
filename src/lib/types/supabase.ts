@@ -1,3 +1,4 @@
+
 export type Json =
   | string
   | number
@@ -12,7 +13,6 @@ export type Database = {
       albums: {
         Row: {
           artist_id: string
-          cover_art_url: string | null
           created_at: string
           id: string
           release_date: string | null
@@ -20,7 +20,6 @@ export type Database = {
         }
         Insert: {
           artist_id: string
-          cover_art_url?: string | null
           created_at?: string
           id?: string
           release_date?: string | null
@@ -28,7 +27,6 @@ export type Database = {
         }
         Update: {
           artist_id?: string
-          cover_art_url?: string | null
           created_at?: string
           id?: string
           release_date?: string | null
@@ -248,6 +246,7 @@ export type Database = {
         Row: {
           album_id: string | null
           artist_id: string | null
+          cover_art_song: string | null
           created_at: string
           duration_in_seconds: number | null
           id: string
@@ -258,6 +257,7 @@ export type Database = {
         Insert: {
           album_id?: string | null
           artist_id?: string | null
+          cover_art_song?: string | null
           created_at?: string
           duration_in_seconds?: number | null
           id?: string
@@ -268,6 +268,7 @@ export type Database = {
         Update: {
           album_id?: string | null
           artist_id?: string | null
+          cover_art_song?: string | null
           created_at?: string
           duration_in_seconds?: number | null
           id?: string
@@ -413,4 +414,3 @@ export type Enums<
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
     : never
-

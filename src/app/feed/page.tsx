@@ -1,3 +1,4 @@
+
 import MainLayout from "@/components/layout/main-layout";
 import { FeedPostCard } from "@/components/feed-post-card";
 import { getFeedPosts } from "@/lib/supabase/queries";
@@ -5,8 +6,8 @@ import { formatDistanceToNow } from 'date-fns';
 import type { FeedPost, FeedPostFromDB } from "@/lib/types";
 
 // Type guard to check if a post has the minimum required data
-function isValidPost(post: FeedPostFromDB): post is FeedPostFromDB & { users: NonNullable<FeedPostFromDB['users']>, songs: NonNullable<FeedPostFromDB['songs']> & { artists: NonNullable<FeedPostFromDB['songs']['artists']>, albums: NonNullable<FeedPostFromDB['songs']['albums']> } } {
-  return !!(post && post.users && post.songs && post.songs.artists && post.songs.albums);
+function isValidPost(post: FeedPostFromDB): post is FeedPostFromDB & { users: NonNullable<FeedPostFromDB['users']>, songs: NonNullable<FeedPostFromDB['songs']> & { artists: NonNullable<FeedPostFromDB['songs']['artists']> } } {
+  return !!(post && post.users && post.songs && post.songs.artists);
 }
 
 
@@ -33,11 +34,11 @@ export default async function FeedPage() {
         name: post.songs.artists.name || 'Unknown Artist', // Safely access artist
       },
       album: {
-        id: post.songs.albums.id || '', // Safely access album
-        title: post.songs.albums.title || '',
-        coverArt: {
-          imageUrl: post.songs.albums.cover_art_url || '',
-        },
+        id: post.songs.album_id || '', 
+        title: '', // Not available
+      },
+      coverArt: {
+        imageUrl: post.songs.cover_art_song || ''
       }
     },
     content: post.content || '',

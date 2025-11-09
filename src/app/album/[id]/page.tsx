@@ -5,23 +5,23 @@ import MainLayout from "@/components/layout/main-layout";
 import { Play } from "lucide-react";
 import { PlayAllButton } from "@/components/play-all-button";
 import { SongItem } from "@/components/song-item";
-import type { Song, SongFromDB } from "@/lib/types";
+import type { Song, SongFromDB, Album } from "@/lib/types";
 
-function mapSongData(songData: SongFromDB, album: Awaited<ReturnType<typeof getAlbumById>>): Song {
+function mapSongData(songData: SongFromDB, album: Pick<Album, 'id' | 'title' | 'artist'>): Song {
   return {
       id: songData.id,
       title: songData.title,
       songUrl: songData.song_url || '',
       artist: {
-        id: album?.artists?.id || '',
-        name: album?.artists?.name || 'Unknown Artist'
+        id: album.artist?.id || '',
+        name: album.artist?.name || 'Unknown Artist'
       },
       album: {
-        id: album?.id || '',
-        title: album?.title || 'Unknown Album',
-        coverArt: {
-          imageUrl: album?.cover_art_url || ''
-        }
+        id: album.id || '',
+        title: album.title || 'Unknown Album',
+      },
+      coverArt: {
+        imageUrl: songData.cover_art_song || ''
       },
       duration: songData.duration_in_seconds ? `${Math.floor(songData.duration_in_seconds / 60)}:${String(songData.duration_in_seconds % 60).padStart(2, '0')}` : '3:00',
       metadata: songData.metadata as Song['metadata'] || {}
@@ -43,7 +43,18 @@ export default async function AlbumDetailPage({ params }: { params: { id: string
     )
   }
 
-  const songs: Song[] = songsFromDb.map(song => mapSongData(song, album));
+  const albumInfoForSongs = {
+    id: album.id,
+    title: album.title,
+    artist: {
+      id: album.artists?.id || '',
+      name: album.artists?.name || 'Unknown Artist',
+    }
+  };
+
+  const songs: Song[] = songsFromDb.map(song => mapSongData(song, albumInfoForSongs));
+  const albumCoverUrl = songs.length > 0 ? songs[Math.floor(Math.random() * songs.length)].coverArt.imageUrl : `https://picsum.photos/seed/${album.id}/600/600`;
+
 
   return (
     <MainLayout>
@@ -51,7 +62,7 @@ export default async function AlbumDetailPage({ params }: { params: { id: string
         <div className="w-full md:w-1/3">
           <div className="aspect-square relative shadow-lg">
             <Image
-              src={album.cover_art_url || `https://picsum.photos/seed/${album.id}/600/600`}
+              src={albumCoverUrl}
               alt={album.title}
               fill
               className="rounded-lg object-cover"

@@ -1,3 +1,4 @@
+
 // src/components/song-item.tsx
 "use client";
 
@@ -18,8 +19,8 @@ export function SongItem({ song, playlist }: { song: Song; playlist: Song[] }) {
     <li className="group flex items-center gap-3 p-2 rounded-md hover:bg-muted/50">
       <div className="relative">
         <Image
-          src={song.album.coverArt.imageUrl || `https://picsum.photos/seed/${song.id}/40/40`}
-          alt={song.album.title}
+          src={song.coverArt.imageUrl || `https://picsum.photos/seed/${song.id}/40/40`}
+          alt={song.title}
           width={40}
           height={40}
           className="rounded-md"

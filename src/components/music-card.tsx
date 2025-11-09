@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -30,9 +31,9 @@ export function MusicCard({ item }: { item: MusicItem }) {
           album: {
             id: song.albums?.id || '',
             title: song.albums?.title || 'Unknown Album',
-            coverArt: {
-              imageUrl: song.albums?.cover_art_url || ''
-            }
+          },
+          coverArt: {
+            imageUrl: song.cover_art_song || ''
           },
           duration: song.duration_in_seconds ? `${Math.floor(song.duration_in_seconds / 60)}:${String(song.duration_in_seconds % 60).padStart(2, '0')}` : '3:00'
         }));

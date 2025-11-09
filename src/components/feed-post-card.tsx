@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import type { FeedPost } from "@/lib/types";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -7,7 +8,7 @@ import { Heart, MessageCircle, Share2 } from "lucide-react";
 
 export function FeedPostCard({ post }: { post: FeedPost }) {
   // Defensive check in case of unexpected data shape
-  if (!post || !post.user || !post.song || !post.song.album) {
+  if (!post || !post.user || !post.song) {
     return null;
   }
 
@@ -29,8 +30,8 @@ export function FeedPostCard({ post }: { post: FeedPost }) {
         <p className="mb-4">{post.content}</p>
         <div className="flex items-center gap-4 rounded-lg border p-3 bg-background/50">
           <Image
-            src={post.song.album.coverArt.imageUrl || `https://picsum.photos/seed/${post.song.id}/64/64`}
-            alt={post.song.album.title}
+            src={post.song.coverArt.imageUrl || `https://picsum.photos/seed/${post.song.id}/64/64`}
+            alt={post.song.title}
             width={64}
             height={64}
             className="rounded-md object-cover"

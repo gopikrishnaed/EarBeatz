@@ -1,3 +1,4 @@
+
 // These types are for data structures used in the frontend components.
 import type { Database } from './types/supabase';
 
@@ -22,7 +23,6 @@ export type Album = {
   id: string;
   title: string;
   artist: Artist;
-  coverArt: ImagePlaceholder;
   release_date?: string;
 };
 
@@ -31,6 +31,7 @@ export type Song = {
   title: string;
   artist: Artist;
   album: Omit<Album, 'artist'>;
+  coverArt: ImagePlaceholder;
   duration?: string; 
   songUrl: string;
   metadata?: {
@@ -66,9 +67,11 @@ export type ArtistFromDB = Database['public']['Tables']['artists']['Row'];
 export type AlbumFromDB = Database['public']['Tables']['albums']['Row'] & {
   artists: { id: string; name: string } | null;
 };
+export type AlbumWithCoverArt = AlbumFromDB & { coverArtUrl: string | null };
+
 export type SongFromDB = Database['public']['Tables']['songs']['Row'] & {
   artists: { id: string; name: string; } | null;
-  albums: { id: string; title: string; cover_art_url: string | null; } | null;
+  albums: { id: string; title: string; } | null;
 };
 export type UserFromDB = Database['public']['Tables']['users']['Row'];
 export type PlaylistFromDB = Database['public']['Tables']['playlists']['Row'] & {
@@ -79,8 +82,10 @@ export type FeedPostFromDB = Omit<Database['public']['Tables']['feed_posts']['Ro
   songs: {
     id: string,
     title: string,
+    artist_id: string | null,
+    album_id: string | null,
+    cover_art_song: string | null,
     artists: { name: string } | null,
-    albums: { id: string, title: string, cover_art_url: string | null } | null
   } | null;
   likes: { user_id: string }[];
   comments: { id: string }[];

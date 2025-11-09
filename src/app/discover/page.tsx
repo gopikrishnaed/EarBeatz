@@ -1,18 +1,18 @@
 
 import MainLayout from "@/components/layout/main-layout";
 import { MusicCard } from "@/components/music-card";
-import { getAlbums } from "@/lib/supabase/queries";
-import type { MusicItem, AlbumFromDB } from "@/lib/types";
+import { getAlbumsWithCoverArt } from "@/lib/supabase/queries";
+import type { MusicItem, AlbumWithCoverArt } from "@/lib/types";
 
 export default async function DiscoverPage() {
-  const albums: AlbumFromDB[] = await getAlbums();
+  const albums: AlbumWithCoverArt[] = await getAlbumsWithCoverArt();
 
   const allMusic: MusicItem[] = albums.map(a => ({
     id: a.id,
     type: 'album',
     title: a.title,
     creator: a.artists?.name || 'Unknown Artist',
-    coverArt: { imageUrl: a.cover_art_url || '' }
+    coverArt: { imageUrl: a.coverArtUrl || '' }
   }));
 
   // Sort by creation date to get newly added items
@@ -24,7 +24,7 @@ export default async function DiscoverPage() {
       type: 'album' as const,
       title: a.title,
       creator: a.artists?.name || 'Unknown Artist',
-      coverArt: { imageUrl: a.cover_art_url || '' }
+      coverArt: { imageUrl: a.coverArtUrl || '' }
     }));
 
   const trending = [...allMusic].sort(() => 0.5 - Math.random()).slice(0, 6);

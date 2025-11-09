@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -89,8 +90,8 @@ export function MusicPlayer() {
       <div className="container mx-auto p-3 flex items-center justify-between">
         <div className="flex items-center gap-4 w-1/4">
           <Image
-            src={currentSong.album.coverArt.imageUrl || `https://picsum.photos/seed/${currentSong.album.id}/56/56`}
-            alt={currentSong.album.title}
+            src={currentSong.coverArt.imageUrl || `https://picsum.photos/seed/${currentSong.id}/56/56`}
+            alt={currentSong.title}
             width={56}
             height={56}
             className="rounded-md object-cover"

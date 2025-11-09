@@ -1,8 +1,9 @@
+
 'use server';
 
 import { createClient as createServerClient } from './server-client';
 import { createClient as createBrowserClient } from './client';
-import type { AlbumFromDB, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB } from '@/lib/types';
+import type { AlbumFromDB, AlbumWithCoverArt, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB } from '@/lib/types';
 
 // Use a client that doesn't rely on the cookie store for server-side queries
 // to avoid issues with Next.js server component rendering.
@@ -26,9 +27,9 @@ function mapSongData(songData: SongFromDB): Song {
         album: {
           id: songData.albums?.id || '',
           title: songData.albums?.title || 'Unknown Album',
-          coverArt: {
-            imageUrl: songData.albums?.cover_art_url || ''
-          }
+        },
+        coverArt: {
+            imageUrl: songData.cover_art_song || ''
         },
         duration: songData.duration_in_seconds ? `${Math.floor(songData.duration_in_seconds / 60)}:${String(songData.duration_in_seconds % 60).padStart(2, '0')}` : '3:00',
         metadata: songData.metadata as Song['metadata'] || {}
@@ -46,8 +47,9 @@ export async function getSongs(): Promise<Song[]> {
             song_url,
             duration_in_seconds,
             metadata,
+            cover_art_song,
             artists ( id, name ),
-            albums ( id, title, cover_art_url )
+            albums ( id, title )
         `);
 
     if (error) {
@@ -74,8 +76,9 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
             title,
             song_url,
             duration_in_seconds,
+            cover_art_song,
             artists ( id, name ),
-            albums ( id, title, cover_art_url )
+            albums ( id, title )
         `)
         .eq('album_id', albumId);
 
@@ -98,8 +101,9 @@ export async function getSongsByPlaylist(playlistId: string): Promise<Song[]> {
                 song_url,
                 duration_in_seconds,
                 metadata,
+                cover_art_song,
                 artists ( id, name ),
-                albums ( id, title, cover_art_url )
+                albums ( id, title )
             )
         `)
         .eq('playlist_id', playlistId);
@@ -147,6 +151,43 @@ export async function getAlbums(): Promise<AlbumFromDB[]> {
     return data || [];
 }
 
+export async function getAlbumsWithCoverArt(): Promise<AlbumWithCoverArt[]> {
+    const supabase = getSupabaseClient();
+    const { data: albums, error: albumsError } = await supabase
+        .from('albums')
+        .select(`
+            *,
+            artists ( name )
+        `);
+    
+    if (albumsError) {
+        console.error('Error fetching albums:', albumsError);
+        return [];
+    }
+    if (!albums) return [];
+
+    const albumsWithCovers = await Promise.all(
+        albums.map(async (album) => {
+            const { data: songs, error: songsError } = await supabase
+                .from('songs')
+                .select('cover_art_song')
+                .eq('album_id', album.id)
+                .not('cover_art_song', 'is', null) // Ensure we only get songs with cover art
+                .limit(10); // Fetch a few songs to choose from
+
+            if (songsError || !songs || songs.length === 0) {
+                return { ...album, coverArtUrl: null };
+            }
+            
+            // Randomly select one of the song's cover arts for the album
+            const randomSong = songs[Math.floor(Math.random() * songs.length)];
+            return { ...album, coverArtUrl: randomSong.cover_art_song };
+        })
+    );
+
+    return albumsWithCovers;
+}
+
 export async function getPlaylists(): Promise<PlaylistFromDB[]> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
@@ -177,7 +218,8 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
                 id, 
                 title,
                 artist_id,
-                album_id
+                album_id,
+                cover_art_song
             ), 
             likes ( user_id ),
             comments ( id )
@@ -199,21 +241,13 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
                 .eq('id', post.songs.artist_id || '')
                 .single();
 
-            const { data: albumData, error: albumError } = await supabase
-                .from('albums')
-                .select('id, title, cover_art_url')
-                .eq('id', post.songs.album_id || '')
-                .single();
-
             if (artistError) console.error('Artist fetch error:', artistError.message);
-            if (albumError) console.error('Album fetch error:', albumError.message);
 
             return {
                 ...post,
                 songs: {
                     ...post.songs,
                     artists: artistData || { name: 'Unknown Artist' },
-                    albums: albumData || { id: '', title: 'Unknown Album', cover_art_url: '' }
                 }
             };
         })
@@ -238,7 +272,7 @@ export async function savePlaylist(
             title,
             description,
             is_public: true,
-            cover_art_url: coverArtUrl || (songs.length > 0 ? songs[0].album.coverArt.imageUrl : null),
+            cover_art_url: coverArtUrl || (songs.length > 0 ? songs[0].coverArt.imageUrl : null),
             // creator_id would be set here if users were authenticated
         })
         .select()
