@@ -48,9 +48,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const moods = ["Happy", "Chill", "Energetic", "Melancholic", "Upbeat", "Focused", "Romantic"];
-
-export function PlaylistGenerator() {
+export function PlaylistGenerator({ moods }: { moods: string[] }) {
   const [playlist, setPlaylist] = useState<GenerateMoodBasedPlaylistOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -118,11 +116,15 @@ export function PlaylistGenerator() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {moods.map((mood) => (
-                          <SelectItem key={mood} value={mood}>
-                            {mood}
-                          </SelectItem>
-                        ))}
+                        {moods.length > 0 ? (
+                           moods.map((mood) => (
+                            <SelectItem key={mood} value={mood}>
+                              {mood}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="No moods" disabled>No moods found in library</SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />

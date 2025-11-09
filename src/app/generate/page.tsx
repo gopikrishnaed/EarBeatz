@@ -1,7 +1,19 @@
 import MainLayout from "@/components/layout/main-layout";
 import { PlaylistGenerator } from "./playlist-generator";
+import { getSongs } from "@/lib/supabase/queries";
+import type { Song } from "@/lib/types";
 
-export default function GeneratePage() {
+export default async function GeneratePage() {
+  const songs: Song[] = await getSongs();
+  
+  const moods = Array.from(
+    new Set(
+      songs
+        .map((song) => song.metadata?.mood)
+        .filter((mood): mood is string => !!mood)
+    )
+  );
+
   return (
     <MainLayout>
       <div className="max-w-2xl mx-auto">
@@ -14,7 +26,7 @@ export default function GeneratePage() {
               Create the perfect playlist for any mood with the power of AI.
             </p>
           </div>
-          <PlaylistGenerator />
+          <PlaylistGenerator moods={moods.length > 0 ? moods : ["Happy", "Chill", "Energetic"]} />
         </div>
       </div>
     </MainLayout>
