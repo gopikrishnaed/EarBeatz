@@ -12,6 +12,7 @@ import {
   LogIn,
   UserPlus,
   Album,
+  Lock,
 } from "lucide-react";
 import {
   SidebarHeader,
@@ -26,7 +27,7 @@ import {
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/browse", label: "Browse", icon: Compass },
-  { href: "/albums", label: "Albums", icon: Album },
+  { href: "/albums", label: "Albums", icon: Album, disabled: true, lockIcon: Lock },
   { href: "/generate", label: "Generate Playlist", icon: Sparkles },
   { href: "/feed", label: "Feed", icon: Users },
 ];
@@ -53,10 +54,12 @@ export default function MainSidebar() {
                 <SidebarMenuButton
                   asChild
                   isActive={pathname === item.href}
-                  tooltip={item.label}
+                  tooltip={item.disabled ? `${item.label} (Coming Soon)`: item.label}
+                  disabled={item.disabled}
+                  className={item.disabled ? "cursor-not-allowed opacity-50" : ""}
                 >
-                  <Link href={item.href}>
-                    <item.icon />
+                  <Link href={item.disabled ? "#" : item.href} tabIndex={item.disabled ? -1 : undefined}>
+                    {item.disabled && item.lockIcon ? <item.lockIcon /> : <item.icon />}
                     <span>{item.label}</span>
                   </Link>
                 </SidebarMenuButton>
