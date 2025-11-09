@@ -1,52 +1,55 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import type { MusicItem } from "@/lib/types";
 import { useMusicPlayer } from "@/context/music-player-context";
 import { Play } from "lucide-react";
 import { getSongsByAlbum } from "@/lib/supabase/queries";
+import { Button } from "./ui/button";
 
 export function MusicCard({ item }: { item: MusicItem }) {
   const { playSong } = useMusicPlayer();
 
-  const handlePlay = async () => {
-    // In a real app, you'd fetch the tracklist for the album or playlist.
-    // For this demo, we'll fetch the first song of an album.
+  const handlePlay = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (item.type === 'album') {
       const songs = await getSongsByAlbum(item.id);
       if (songs && songs.length > 0) {
-        // The context expects a slightly different format, so we map it.
-        const songToPlay = {
-          id: songs[0].id,
-          title: songs[0].title,
-          songUrl: songs[0].song_url,
+        const mappedSongs = songs.map(song => ({
+          id: song.id,
+          title: song.title,
+          songUrl: song.song_url,
           artist: {
-            id: songs[0].artists?.id || '',
-            name: songs[0].artists?.name || 'Unknown Artist'
+            id: song.artists?.id || '',
+            name: song.artists?.name || 'Unknown Artist'
           },
           album: {
-            id: songs[0].albums?.id || '',
-            title: songs[0].albums?.title || 'Unknown Album',
+            id: song.albums?.id || '',
+            title: song.albums?.title || 'Unknown Album',
             coverArt: {
-              imageUrl: songs[0].albums?.cover_art_url || ''
+              imageUrl: song.albums?.cover_art_url || ''
             }
           }
-        };
-        playSong(songToPlay);
+        }));
+        playSong(mappedSongs[0], mappedSongs);
       }
     }
   };
 
-  return (
+  const cardContent = (
     <Card className="overflow-hidden border-0 bg-card/60 hover:bg-card transition-colors group relative">
-       <button
+      <Button
         onClick={handlePlay}
-        className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        variant="ghost"
+        size="icon"
+        className="absolute bottom-20 right-2 bg-primary/80 hover:bg-primary text-primary-foreground rounded-full h-12 w-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-4 z-10"
         aria-label={`Play ${item.title}`}
       >
-        <Play className="w-12 h-12 text-white fill-white" />
-      </button>
+        <Play className="w-6 h-6 fill-current" />
+      </Button>
       <CardContent className="p-4 space-y-3">
         <div className="aspect-square relative">
           <Image
@@ -63,4 +66,11 @@ export function MusicCard({ item }: { item: MusicItem }) {
       </CardContent>
     </Card>
   );
+
+  if (item.type === 'album') {
+    return <Link href={`/album/${item.id}`} className="block">{cardContent}</Link>;
+  }
+
+  // Fallback for other types like playlists if they need a different link
+  return cardContent;
 }

@@ -21,7 +21,7 @@ export type Artist = {
 export type Album = {
   id: string;
   title: string;
-  artist?: Artist;
+  artist: Artist;
   coverArt: ImagePlaceholder;
   release_date?: string;
 };
@@ -30,7 +30,7 @@ export type Song = {
   id: string;
   title: string;
   artist: Artist;
-  album: Album;
+  album: Omit<Album, 'artist'>;
   duration?: string; 
   songUrl: string;
   metadata?: {
@@ -63,7 +63,7 @@ export type FeedPost = {
 // They are used in server-side data fetching.
 export type ArtistFromDB = Database['public']['Tables']['artists']['Row'];
 export type AlbumFromDB = Database['public']['Tables']['albums']['Row'] & {
-  artists: { name: string } | null;
+  artists: { id: string; name: string } | null;
 };
 export type SongFromDB = Database['public']['Tables']['songs']['Row'] & {
   artists: { id: string; name: string; } | null;

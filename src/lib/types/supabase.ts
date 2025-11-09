@@ -11,7 +11,7 @@ export type Database = {
     Tables: {
       albums: {
         Row: {
-          artist_id: string | null
+          artist_id: string
           cover_art_url: string | null
           created_at: string
           id: string
@@ -19,7 +19,7 @@ export type Database = {
           title: string
         }
         Insert: {
-          artist_id?: string | null
+          artist_id: string
           cover_art_url?: string | null
           created_at?: string
           id?: string
@@ -27,7 +27,7 @@ export type Database = {
           title: string
         }
         Update: {
-          artist_id?: string | null
+          artist_id?: string
           cover_art_url?: string | null
           created_at?: string
           id?: string
@@ -349,7 +349,7 @@ export type Tables<
     }
     ? R
     : never
-  : PublicTableNameOr_options extends keyof (PublicSchema["Tables"] &
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
         PublicSchema["Views"])
     ? (PublicSchema["Tables"] &
         PublicSchema["Views"])[PublicTableNameOrOptions] extends {
@@ -413,3 +413,4 @@ export type Enums<
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
     : never
+

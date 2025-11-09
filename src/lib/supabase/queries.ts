@@ -62,6 +62,7 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
             id,
             title,
             song_url,
+            duration_in_seconds,
             artists ( id, name ),
             albums ( id, title, cover_art_url )
         `)
@@ -73,6 +74,24 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
     }
     
     return data || [];
+}
+
+export async function getAlbumById(albumId: string): Promise<AlbumFromDB | null> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('albums')
+        .select(`
+            *,
+            artists ( id, name )
+        `)
+        .eq('id', albumId)
+        .single();
+    
+    if (error) {
+        console.error('Error fetching album:', error);
+        return null;
+    }
+    return data;
 }
 
 export async function getAlbums(): Promise<AlbumFromDB[]> {
