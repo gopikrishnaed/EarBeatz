@@ -11,6 +11,7 @@
 import {ai} from '@/ai/genkit';
 import { getSongs } from '@/lib/supabase/queries';
 import {z} from 'genkit';
+import type { Song } from '@/lib/types';
 
 const GenerateMoodBasedPlaylistInputSchema = z.object({
   mood: z
@@ -22,9 +23,35 @@ export type GenerateMoodBasedPlaylistInput = z.infer<
   typeof GenerateMoodBasedPlaylistInputSchema
 >;
 
+const SongSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  artist: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  album: z.object({
+    id: z.string(),
+    title: z.string(),
+    coverArt: z.object({
+      imageUrl: z.string(),
+    }),
+  }),
+  songUrl: z.string(),
+  duration: z.string().optional(),
+  metadata: z
+    .object({
+      genre: z.string().optional(),
+      mood: z.string().optional(),
+      instruments: z.array(z.string()).optional(),
+    })
+    .optional(),
+});
+
+
 const GenerateMoodBasedPlaylistOutputSchema = z.object({
   playlistDescription: z.string().describe('A description of the generated playlist.'),
-  songs: z.array(z.string()).describe('A list of song titles for the playlist.'),
+  songs: z.array(SongSchema).describe('A list of song objects for the playlist.'),
 });
 export type GenerateMoodBasedPlaylistOutput = z.infer<
   typeof GenerateMoodBasedPlaylistOutputSchema
@@ -41,23 +68,11 @@ const getAvailableSongs = ai.defineTool(
     name: 'getAvailableSongs',
     description: 'Get a list of all available songs in the music library.',
     inputSchema: z.object({}),
-    outputSchema: z.array(
-      z.object({
-        title: z.string(),
-        artist: z.string(),
-        genre: z.string().optional(),
-        mood: z.string().optional(),
-      })
-    ),
+    outputSchema: z.array(SongSchema),
   },
   async () => {
     const songs = await getSongs();
-    return songs.map((song) => ({
-      title: song.title,
-      artist: song.artist.name,
-      genre: song.metadata?.genre,
-      mood: song.metadata?.mood,
-    }));
+    return songs;
   }
 );
 
@@ -77,7 +92,7 @@ Use the genre and mood from the song's metadata to make a better selection.
 Mood: {{{mood}}}
 Playlist Length: {{{playlistLength}}}
 
-Respond with a creative playlist description, followed by the list of song titles you selected.`,
+Respond with a creative playlist description, followed by the list of song objects you selected. Ensure the songs you return are the full song objects provided by the tool.`,
 });
 
 const generateMoodBasedPlaylistFlow = ai.defineFlow(

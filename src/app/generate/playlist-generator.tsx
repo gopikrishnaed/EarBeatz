@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Image from "next/image";
 import {
   generateMoodBasedPlaylist,
   type GenerateMoodBasedPlaylistOutput,
@@ -34,8 +35,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { ListMusic, Loader2, Music, ServerCrash } from "lucide-react";
+import { ListMusic, Loader2, Music, Play, ServerCrash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useMusicPlayer } from "@/context/music-player-context";
+import type { Song } from "@/lib/types";
+
 
 const formSchema = z.object({
   mood: z.string().min(1, "Please select a mood."),
@@ -50,6 +54,7 @@ export function PlaylistGenerator() {
   const [playlist, setPlaylist] = useState<GenerateMoodBasedPlaylistOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { playSong } = useMusicPlayer();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -76,6 +81,17 @@ export function PlaylistGenerator() {
       setIsLoading(false);
     }
   }
+
+  const handlePlaySong = (song: Song) => {
+    playSong(song, playlist?.songs);
+  };
+  
+  const handlePlayAll = () => {
+    if (playlist && playlist.songs.length > 0) {
+      playSong(playlist.songs[0], playlist.songs);
+    }
+  };
+
 
   return (
     <>
@@ -155,22 +171,47 @@ export function PlaylistGenerator() {
       {playlist && (
         <Card className="mt-6">
           <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <ListMusic className="w-6 h-6 text-primary" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <ListMusic className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <CardTitle>{form.getValues("mood")} Playlist</CardTitle>
+                  <CardDescription>{playlist.playlistDescription}</CardDescription>
+                </div>
               </div>
-              <div>
-                <CardTitle>{form.getValues("mood")} Playlist</CardTitle>
-                <CardDescription>{playlist.playlistDescription}</CardDescription>
-              </div>
+              <Button onClick={handlePlayAll}>
+                <Play className="mr-2 h-4 w-4" /> Play All
+              </Button>
             </div>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
               {playlist.songs.map((song, index) => (
-                <li key={index} className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50">
-                  <Music className="w-4 h-4 text-muted-foreground" />
-                  <span>{song}</span>
+                <li key={song.id} className="group flex items-center gap-3 p-2 rounded-md hover:bg-muted/50">
+                  <div className="relative">
+                    <Image
+                      src={song.album.coverArt.imageUrl || `https://picsum.photos/seed/${song.id}/40/40`}
+                      alt={song.album.title}
+                      width={40}
+                      height={40}
+                      className="rounded-md"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute inset-0 h-full w-full bg-black/50 opacity-0 group-hover:opacity-100"
+                      onClick={() => handlePlaySong(song)}
+                    >
+                      <Play className="h-5 w-5 fill-white text-white" />
+                    </Button>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium">{song.title}</p>
+                    <p className="text-sm text-muted-foreground">{song.artist.name}</p>
+                  </div>
+                  <span className="text-sm text-muted-foreground">{song.duration}</span>
                 </li>
               ))}
             </ul>
