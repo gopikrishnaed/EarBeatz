@@ -2,7 +2,7 @@ import MainLayout from "@/components/layout/main-layout";
 import { SongItem } from "@/components/song-item";
 import { getSongs } from "@/lib/supabase/queries";
 import { MusicCard } from "@/components/music-card";
-import type { MusicItem, Song, AlbumFromDB } from "@/lib/types";
+import type { MusicItem, Song } from "@/lib/types";
 
 export default async function DashboardPage() {
   const allSongs: Song[] = await getSongs();
@@ -13,7 +13,7 @@ export default async function DashboardPage() {
     const mixSongs = shuffled.slice(0, 12);
     return {
       id: `mix-${i + 1}`,
-      type: 'playlist',
+      type: 'playlist' as const,
       title: `Daily Mix ${i + 1}`,
       creator: 'For You',
       coverArt: mixSongs.length > 0 ? mixSongs[0].album.coverArt : { imageUrl: '' },
@@ -24,11 +24,7 @@ export default async function DashboardPage() {
   
   // Sort by creation date to get newly added items
   const newSongs = [...allSongs]
-    .sort((a, b) => {
-        // A proper implementation would require created_at on songs
-        // We'll simulate by shuffling for now
-        return 0.5 - Math.random();
-    })
+    .sort(() => 0.5 - Math.random()) // Simulate newness by shuffling
     .slice(0, 6);
 
   const featuredSongs = [...allSongs].sort(() => 0.5 - Math.random()).slice(0, 10);
@@ -54,31 +50,33 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        <section>
-            <h2 className="text-2xl font-semibold font-headline mb-4">Newly Added</h2>
-            <ul className="space-y-2">
-                {newSongs.length > 0 ? (
-                    newSongs.map((song) => (
-                        <SongItem key={song.id} song={song} playlist={newSongs} />
-                    ))
-                ) : (
-                    <p className="text-muted-foreground">No new songs found.</p>
-                )}
-            </ul>
-        </section>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
+            <section>
+                <h2 className="text-2xl font-semibold font-headline mb-4">Newly Added</h2>
+                <ul className="space-y-2">
+                    {newSongs.length > 0 ? (
+                        newSongs.map((song) => (
+                            <SongItem key={song.id} song={song} playlist={newSongs} />
+                        ))
+                    ) : (
+                        <p className="text-muted-foreground">No new songs found.</p>
+                    )}
+                </ul>
+            </section>
 
-        <section>
-          <h2 className="text-2xl font-semibold font-headline mb-4">Featured Tracks</h2>
-          {featuredSongs.length > 0 ? (
-            <ul className="space-y-2">
-                {featuredSongs.map((song) => (
-                    <SongItem key={song.id} song={song} playlist={allSongs} />
-                ))}
-            </ul>
-            ) : (
-                <p className="text-muted-foreground">No songs found in your library yet.</p>
-            )}
-        </section>
+            <section>
+              <h2 className="text-2xl font-semibold font-headline mb-4">Featured Tracks</h2>
+              {featuredSongs.length > 0 ? (
+                <ul className="space-y-2">
+                    {featuredSongs.map((song) => (
+                        <SongItem key={song.id} song={song} playlist={allSongs} />
+                    ))}
+                </ul>
+                ) : (
+                    <p className="text-muted-foreground">No songs found in your library yet.</p>
+                )}
+            </section>
+        </div>
       </div>
     </MainLayout>
   );
