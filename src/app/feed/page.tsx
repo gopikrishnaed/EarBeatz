@@ -1,4 +1,5 @@
 
+
 import MainLayout from "@/components/layout/main-layout";
 import { FeedPostCard } from "@/components/feed-post-card";
 import { getFeedPosts, getSongs } from "@/lib/supabase/queries";
@@ -11,36 +12,43 @@ export default async function FeedPage() {
   const songs = await getSongs();
 
   const formattedPosts: FeedPost[] = posts
-    .map(post => ({
-    id: post.id,
-    user: {
-      id: post.users?.id || '',
-      name: post.users?.name || 'Unknown User',
-      avatar: {
-        imageUrl: post.users?.avatar_url || '',
+    .map(post => {
+      // Basic validation to ensure the post has the minimum required data
+      if (!post.users || !post.songs) {
+        return null;
       }
-    },
-    song: {
-      id: post.songs?.id || '',
-      title: post.songs?.title || 'Unknown Song',
-      songUrl: post.songs?.song_url || '',
-      artist: {
-        id: post.songs?.artists?.id || '',
-        name: post.songs?.artists?.name || 'Unknown Artist',
-      },
-      album: {
-        id: post.songs?.album_id || '',
-        title: post.songs?.albums?.title || 'Unknown Album',
-      },
-      coverArt: {
-        imageUrl: post.songs?.cover_art_song || ''
-      },
-    } as Song,
-    content: post.content || '',
-    likes: post.likes?.length || 0,
-    comments: post.comments?.length || 0,
-    timestamp: post.created_at ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true }) : 'just now',
-  }));
+      return {
+        id: post.id,
+        user: {
+          id: post.users.id,
+          name: post.users.name || 'Unknown User',
+          avatar: {
+            imageUrl: post.users.avatar_url || '',
+          }
+        },
+        song: {
+          id: post.songs.id,
+          title: post.songs.title || 'Unknown Song',
+          songUrl: post.songs.song_url || '',
+          artist: {
+            id: post.songs.artists?.id || '',
+            name: post.songs.artists?.name || 'Unknown Artist',
+          },
+          album: {
+            id: post.songs.albums?.id || '',
+            title: post.songs.albums?.title || 'Unknown Album',
+          },
+          coverArt: {
+            imageUrl: post.songs.cover_art_song || ''
+          },
+        } as Song,
+        content: post.content || '',
+        likes: post.likes?.length || 0,
+        comments: post.comments?.length || 0,
+        timestamp: post.created_at ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true }) : 'just now',
+      }
+    })
+    .filter((post): post is FeedPost => post !== null);
 
   // Hardcoded user for now, in a real app this would come from auth
   const currentUser: UserFromDB = {

@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import { createClient as createServerClient } from './server-client';
@@ -42,12 +43,7 @@ export async function getSongs(): Promise<Song[]> {
     const { data, error } = await supabase
         .from('songs')
         .select(`
-            id,
-            title,
-            song_url,
-            cover_art_song,
-            duration_in_seconds,
-            metadata,
+            *,
             artists ( id, name ),
             albums ( id, title )
         `);
@@ -150,7 +146,7 @@ export async function getAlbumsWithCoverArt(): Promise<AlbumWithCoverArt[]> {
             artists ( id, name ),
             songs ( cover_art_song )
         `);
-    
+
     if (error) {
         console.error('Error fetching albums with cover art:', error);
         return [];
@@ -169,6 +165,7 @@ export async function getAlbumsWithCoverArt(): Promise<AlbumWithCoverArt[]> {
 
     return albumsWithCovers as AlbumWithCoverArt[];
 }
+
 
 export async function getPlaylists(): Promise<PlaylistFromDB[]> {
     const supabase = getSupabaseClient();
