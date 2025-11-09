@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import { createClient as createServerClient } from './server-client';
@@ -143,7 +144,7 @@ export async function getAlbumsWithCoverArt(): Promise<AlbumWithCoverArt[]> {
         .from('albums')
         .select(`
             *,
-            artists ( name )
+            artists ( id, name )
         `);
     
     if (albumsError) {
@@ -163,7 +164,10 @@ export async function getAlbumsWithCoverArt(): Promise<AlbumWithCoverArt[]> {
                 .maybeSingle();
 
             if (songError) {
-                console.error(`Error fetching cover art for album ${album.id}:`, songError);
+                // Don't log error if no song is found, it's a valid case
+                if (songError.code !== 'PGRST116') {
+                  console.error(`Error fetching cover art for album ${album.id}:`, songError);
+                }
                 return { ...album, coverArtUrl: null };
             }
             
@@ -202,7 +206,8 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
             users ( id, name, avatar_url ),
             songs ( 
                 *,
-                artists ( name )
+                artists ( id, name ),
+                albums ( id, title )
             ), 
             likes ( user_id ),
             comments ( id )

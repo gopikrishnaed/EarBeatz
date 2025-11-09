@@ -1,4 +1,5 @@
 
+
 // These types are for data structures used in the frontend components.
 import type { Database } from './types/supabase';
 
@@ -24,13 +25,14 @@ export type Album = {
   title: string;
   artist?: Artist; // Artist can be optional
   release_date?: string;
+  coverArt?: ImagePlaceholder; // Optional cover art for albums
 };
 
 export type Song = {
   id: string;
   title: string;
   artist: Artist;
-  album: Omit<Album, 'artist'>;
+  album: Omit<Album, 'artist' | 'coverArt'>;
   coverArt: ImagePlaceholder;
   duration?: string; 
   songUrl: string;
@@ -65,7 +67,7 @@ export type FeedPost = {
 // They are used in server-side data fetching.
 export type ArtistFromDB = Database['public']['Tables']['artists']['Row'];
 export type AlbumFromDB = Database['public']['Tables']['albums']['Row'] & {
-  artists: { name: string } | null;
+  artists: { id: string, name: string } | null;
 };
 export type AlbumWithCoverArt = AlbumFromDB & { coverArtUrl: string | null };
 
@@ -79,9 +81,7 @@ export type PlaylistFromDB = Database['public']['Tables']['playlists']['Row'] & 
 };
 export type FeedPostFromDB = Omit<Database['public']['Tables']['feed_posts']['Row'], 'user_id' | 'song_id'> & {
   users: { id: string, name: string, avatar_url: string | null } | null;
-  songs: (Omit<SongFromDB, 'albums'> & {
-    artists: { name: string } | null,
-  }) | null;
+  songs: (SongFromDB) | null;
   likes: { user_id: string }[];
   comments: { id: string }[];
 }
