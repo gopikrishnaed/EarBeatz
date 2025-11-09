@@ -17,7 +17,7 @@ export default async function DashboardPage() {
       type: 'playlist' as const,
       title: `Daily Mix ${i + 1}`,
       creator: 'For You',
-      coverArt: mixSongs.length > 0 ? mixSongs[0].album.coverArt : { imageUrl: '' },
+      coverArt: mixSongs.length > 0 ? mixSongs[0].coverArt : { imageUrl: '' },
       // Storing songs directly for client-side playback
       songs: mixSongs
     };
