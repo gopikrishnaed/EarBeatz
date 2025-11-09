@@ -19,7 +19,15 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased">
+      <body 
+        className="font-body antialiased"
+        style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1538947151057-dfeac35d6fb6?q=80&w=2070')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed'
+        }}
+      >
         {children}
         <Toaster />
       </body>
