@@ -4,20 +4,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import type { MusicItem, Song } from "@/lib/types";
+import type { MusicItem, Song, SongFromDB } from "@/lib/types";
 import { useMusicPlayer } from "@/context/music-player-context";
 import { Play } from "lucide-react";
-import { getSongsByAlbum, getSongsByPlaylist } from "@/lib/supabase/queries";
+import { getAlbumById, getSongsByAlbum, getSongsByPlaylist } from "@/lib/supabase/queries";
 import { Button } from "./ui/button";
 
-function mapSongData(songData: any, albumInfo: any): Song {
+function mapSongData(songData: SongFromDB, albumInfo: any): Song {
   return {
     id: songData.id,
     title: songData.title,
     songUrl: songData.song_url || '',
     artist: {
-      id: albumInfo.artist?.id || '',
-      name: albumInfo.artist?.name || 'Unknown Artist'
+      id: songData.artists?.id || albumInfo.artists?.id || '',
+      name: songData.artists?.name || albumInfo.artists?.name || 'Unknown Artist'
     },
     album: {
       id: albumInfo.id,
@@ -38,17 +38,10 @@ export function MusicCard({ item }: { item: MusicItem }) {
     e.preventDefault();
     
     if (item.type === 'album') {
+      const albumInfo = await getAlbumById(item.id);
       const songsFromDb = await getSongsByAlbum(item.id);
-      if (songsFromDb && songsFromDb.length > 0) {
-        const albumInfoForSongs = {
-          id: songsFromDb[0].album_id,
-          title: songsFromDb[0].albums?.title,
-          artist: {
-            id: songsFromDb[0].artists?.id,
-            name: songsFromDb[0].artists?.name
-          }
-        }
-        const mappedSongs = songsFromDb.map(song => mapSongData(song, albumInfoForSongs));
+      if (songsFromDb && songsFromDb.length > 0 && albumInfo) {
+        const mappedSongs = songsFromDb.map(song => mapSongData(song, albumInfo));
         playSong(mappedSongs[0], mappedSongs);
       }
     } else if (item.type === 'playlist') {

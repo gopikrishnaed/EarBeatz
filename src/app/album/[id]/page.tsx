@@ -6,14 +6,14 @@ import { PlayAllButton } from "@/components/play-all-button";
 import { SongItem } from "@/components/song-item";
 import type { Song, AlbumFromDB, SongFromDB } from "@/lib/types";
 
-function mapSongData(songData: SongFromDB, album: AlbumFromDB): Song {
+function mapSongData(songData: SongFromDB, album: (AlbumFromDB & { artists: { id: string, name: string } | null})): Song {
   return {
       id: songData.id,
       title: songData.title,
       songUrl: songData.song_url || '',
       artist: {
-        id: songData.artists?.id || '',
-        name: songData.artists?.name || 'Unknown Artist'
+        id: songData.artists?.id || album.artists?.id || '',
+        name: songData.artists?.name || album.artists?.name || 'Unknown Artist'
       },
       album: {
         id: album.id,
@@ -43,7 +43,7 @@ export default async function AlbumDetailPage({ params }: { params: { id: string
   }
   
   const songs: Song[] = songsFromDb.map(song => mapSongData(song, album));
-  const albumCoverUrl = songs.length > 0 ? songs[Math.floor(Math.random() * songs.length)].coverArt.imageUrl : `https://picsum.photos/seed/${album.id}/600/600`;
+  const albumCoverUrl = songs.length > 0 ? songs[0].coverArt.imageUrl : `https://picsum.photos/seed/${album.id}/600/600`;
 
 
   return (

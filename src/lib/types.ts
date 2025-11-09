@@ -22,7 +22,7 @@ export type Artist = {
 export type Album = {
   id: string;
   title: string;
-  artist: Artist;
+  artist?: Artist; // Artist can be optional
   release_date?: string;
 };
 
@@ -65,7 +65,7 @@ export type FeedPost = {
 // They are used in server-side data fetching.
 export type ArtistFromDB = Database['public']['Tables']['artists']['Row'];
 export type AlbumFromDB = Database['public']['Tables']['albums']['Row'] & {
-  artists: { id: string; name: string } | null;
+  artists: { name: string } | null;
 };
 export type AlbumWithCoverArt = AlbumFromDB & { coverArtUrl: string | null };
 

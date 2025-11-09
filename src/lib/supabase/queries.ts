@@ -8,6 +8,7 @@ import type { AlbumFromDB, AlbumWithCoverArt, FeedPostFromDB, PlaylistFromDB, So
 // Use a client that doesn't rely on the cookie store for server-side queries
 // to avoid issues with Next.js server component rendering.
 const getSupabaseClient = () => {
+  // This function needs to be async to correctly handle cookies.
   if (typeof window === 'undefined') {
     return createServerClient();
   }
@@ -118,7 +119,7 @@ export async function getSongsByPlaylist(playlistId: string): Promise<Song[]> {
     return songData.map(mapSongData);
 }
 
-export async function getAlbumById(albumId: string): Promise<AlbumFromDB | null> {
+export async function getAlbumById(albumId: string): Promise<(AlbumFromDB & { artists: { id: string, name: string } | null}) | null> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('albums')
@@ -169,20 +170,20 @@ export async function getAlbumsWithCoverArt(): Promise<AlbumWithCoverArt[]> {
 
     const albumsWithCovers = await Promise.all(
         albums.map(async (album) => {
-            const { data: songs, error: songsError } = await supabase
+            const { data: song, error: songError } = await supabase
                 .from('songs')
                 .select('cover_art_song')
                 .eq('album_id', album.id)
-                .not('cover_art_song', 'is', null) // Ensure we only get songs with cover art
-                .limit(10); // Fetch a few songs to choose from
+                .not('cover_art_song', 'is', null)
+                .limit(1)
+                .maybeSingle();
 
-            if (songsError || !songs || songs.length === 0) {
+            if (songError) {
+                console.error(`Error fetching cover art for album ${album.id}:`, songError);
                 return { ...album, coverArtUrl: null };
             }
             
-            // Randomly select one of the song's cover arts for the album
-            const randomSong = songs[Math.floor(Math.random() * songs.length)];
-            return { ...album, coverArtUrl: randomSong.cover_art_song };
+            return { ...album, coverArtUrl: song?.cover_art_song || null };
         })
     );
 
