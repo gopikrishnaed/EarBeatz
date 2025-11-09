@@ -9,6 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import { getSongs } from '@/lib/supabase/queries';
 import {z} from 'genkit';
 
 const GenerateMoodBasedPlaylistInputSchema = z.object({
@@ -35,18 +36,48 @@ export async function generateMoodBasedPlaylist(
   return generateMoodBasedPlaylistFlow(input);
 }
 
+const getAvailableSongs = ai.defineTool(
+  {
+    name: 'getAvailableSongs',
+    description: 'Get a list of all available songs in the music library.',
+    inputSchema: z.object({}),
+    outputSchema: z.array(
+      z.object({
+        title: z.string(),
+        artist: z.string(),
+        genre: z.string().optional(),
+        mood: z.string().optional(),
+      })
+    ),
+  },
+  async () => {
+    const songs = await getSongs();
+    return songs.map((song) => ({
+      title: song.title,
+      artist: song.artist.name,
+      genre: song.metadata?.genre,
+      mood: song.metadata?.mood,
+    }));
+  }
+);
+
+
 const prompt = ai.definePrompt({
   name: 'generateMoodBasedPlaylistPrompt',
   input: {schema: GenerateMoodBasedPlaylistInputSchema},
   output: {schema: GenerateMoodBasedPlaylistOutputSchema},
-  prompt: `You are a playlist generation expert. You will be provided a mood and a desired playlist length and you will respond with a playlist consisting of song names that fit the mood.
+  tools: [getAvailableSongs],
+  prompt: `You are a playlist generation expert. Your task is to create a playlist based on a user's specified mood and desired length.
 
-You can also use the genre and mood from the song's metadata to make a better selection.
+You MUST use the 'getAvailableSongs' tool to fetch the list of songs from the user's library.
+From this list, you will select songs that perfectly match the requested mood. You CANNOT suggest any song that is not present in the provided list.
+
+Use the genre and mood from the song's metadata to make a better selection.
 
 Mood: {{{mood}}}
 Playlist Length: {{{playlistLength}}}
 
-Respond with a playlist description, followed by a list of songs.`,
+Respond with a creative playlist description, followed by the list of song titles you selected.`,
 });
 
 const generateMoodBasedPlaylistFlow = ai.defineFlow(
