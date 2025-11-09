@@ -5,20 +5,20 @@ import MainLayout from "@/components/layout/main-layout";
 import { Play } from "lucide-react";
 import { PlayAllButton } from "@/components/play-all-button";
 import { SongItem } from "@/components/song-item";
-import type { Song, SongFromDB, Album } from "@/lib/types";
+import type { Song, AlbumFromDB, SongFromDB } from "@/lib/types";
 
-function mapSongData(songData: SongFromDB, album: Pick<Album, 'id' | 'title' | 'artist'>): Song {
+function mapSongData(songData: SongFromDB): Song {
   return {
       id: songData.id,
       title: songData.title,
       songUrl: songData.song_url || '',
       artist: {
-        id: album.artist?.id || '',
-        name: album.artist?.name || 'Unknown Artist'
+        id: songData.artists?.id || '',
+        name: songData.artists?.name || 'Unknown Artist'
       },
       album: {
-        id: album.id || '',
-        title: album.title || 'Unknown Album',
+        id: songData.albums?.id || '',
+        title: songData.albums?.title || 'Unknown Album',
       },
       coverArt: {
         imageUrl: songData.cover_art_song || ''
@@ -42,17 +42,8 @@ export default async function AlbumDetailPage({ params }: { params: { id: string
       </MainLayout>
     )
   }
-
-  const albumInfoForSongs = {
-    id: album.id,
-    title: album.title,
-    artist: {
-      id: album.artists?.id || '',
-      name: album.artists?.name || 'Unknown Artist',
-    }
-  };
-
-  const songs: Song[] = songsFromDb.map(song => mapSongData(song as SongFromDB, albumInfoForSongs));
+  
+  const songs: Song[] = songsFromDb.map(mapSongData);
   const albumCoverUrl = songs.length > 0 ? songs[Math.floor(Math.random() * songs.length)].coverArt.imageUrl : `https://picsum.photos/seed/${album.id}/600/600`;
 
 
@@ -92,5 +83,3 @@ export default async function AlbumDetailPage({ params }: { params: { id: string
     </MainLayout>
   );
 }
-
-    

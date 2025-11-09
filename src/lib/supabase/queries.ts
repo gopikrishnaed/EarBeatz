@@ -77,6 +77,7 @@ export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
             song_url,
             duration_in_seconds,
             cover_art_song,
+            metadata,
             album_id,
             artists ( id, name ),
             albums ( id, title )
