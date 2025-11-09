@@ -82,7 +82,7 @@ export default async function FeedPage() {
               <div className="text-center py-10 border rounded-lg bg-card/50">
                 <p className="text-lg font-medium">Your feed is empty</p>
                 <p className="text-muted-foreground">
-                  Follow friends or check back later for new posts.
+                  Be the first to share a song!
                 </p>
               </div>
             )}

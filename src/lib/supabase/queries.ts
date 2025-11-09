@@ -1,6 +1,7 @@
 
 
 
+
 'use server';
 
 import { createClient as createServerClient } from './server-client';
@@ -65,14 +66,13 @@ export async function getSongs(): Promise<Song[]> {
 }
 
 
-export async function getSongsByAlbum(albumId: string): Promise<Song[]> {
+export async function getSongsByAlbum(albumId: string): Promise<SongFromDB[]> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('songs')
         .select(`
             *,
-            artists ( id, name ),
-            albums ( id, title )
+            artists ( id, name )
         `)
         .eq('album_id', albumId);
 
@@ -81,7 +81,7 @@ export async function getSongsByAlbum(albumId: string): Promise<Song[]> {
         return [];
     }
     
-    return data.map(mapSongData) || [];
+    return data || [];
 }
 
 export async function getSongsByPlaylist(playlistId: string): Promise<Song[]> {
