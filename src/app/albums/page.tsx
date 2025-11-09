@@ -1,19 +1,8 @@
 
 import MainLayout from "@/components/layout/main-layout";
-import { MusicCard } from "@/components/music-card";
-import { getAlbumsWithCoverArt } from "@/lib/supabase/queries";
-import type { MusicItem } from "@/lib/types";
+import { HardHat } from "lucide-react";
 
-export default async function AlbumsPage() {
-  const albums = await getAlbumsWithCoverArt();
-  const musicItems: MusicItem[] = albums.map(a => ({
-    id: a.id,
-    type: 'album',
-    title: a.title,
-    creator: a.artists?.name || 'Unknown Artist',
-    coverArt: { imageUrl: a.coverArtUrl || '' }
-  }));
-
+export default function AlbumsPage() {
   return (
     <MainLayout>
       <div className="max-w-7xl mx-auto space-y-8">
@@ -26,13 +15,13 @@ export default async function AlbumsPage() {
           </p>
         </div>
 
-        <section>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {musicItems.map((item) => (
-              <MusicCard key={item.id} item={item} />
-            ))}
-          </div>
-        </section>
+        <div className="flex flex-col items-center justify-center text-center py-20 border rounded-lg bg-card/50">
+          <HardHat className="w-16 h-16 text-primary mb-4" />
+          <h2 className="text-2xl font-bold">Coming Soon!</h2>
+          <p className="text-muted-foreground max-w-md">
+            This section is currently under construction. We're working hard to bring you an amazing album browsing experience.
+          </p>
+        </div>
       </div>
     </MainLayout>
   );
