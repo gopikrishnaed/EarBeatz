@@ -9,7 +9,7 @@ import {
   generateMoodBasedPlaylist,
   type GenerateMoodBasedPlaylistOutput,
 } from "@/ai/flows/generate-mood-based-playlist";
-
+import { savePlaylist } from "@/lib/supabase/queries";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -35,7 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { ListMusic, Loader2, Music, Play, ServerCrash } from "lucide-react";
+import { ListMusic, Loader2, Music, Play, Save, ServerCrash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMusicPlayer } from "@/context/music-player-context";
 import type { Song } from "@/lib/types";
@@ -51,6 +51,7 @@ type FormValues = z.infer<typeof formSchema>;
 export function PlaylistGenerator({ moods }: { moods: string[] }) {
   const [playlist, setPlaylist] = useState<GenerateMoodBasedPlaylistOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
   const { playSong } = useMusicPlayer();
 
@@ -90,6 +91,30 @@ export function PlaylistGenerator({ moods }: { moods: string[] }) {
     }
   };
 
+  const handleSavePlaylist = async () => {
+    if (!playlist) return;
+
+    setIsSaving(true);
+    const result = await savePlaylist(
+      `${form.getValues("mood")} Playlist`, 
+      playlist.playlistDescription, 
+      playlist.songs
+    );
+    setIsSaving(false);
+
+    if (result.success) {
+      toast({
+        title: "Playlist Saved!",
+        description: `Your "${form.getValues("mood")} Playlist" has been saved.`,
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Save Failed",
+        description: "There was an error saving your playlist. Please try again.",
+      });
+    }
+  };
 
   return (
     <>
@@ -183,9 +208,22 @@ export function PlaylistGenerator({ moods }: { moods: string[] }) {
                   <CardDescription>{playlist.playlistDescription}</CardDescription>
                 </div>
               </div>
-              <Button onClick={handlePlayAll}>
-                <Play className="mr-2 h-4 w-4" /> Play All
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={handleSavePlaylist} disabled={isSaving}>
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" /> Save
+                    </>
+                  )}
+                </Button>
+                <Button onClick={handlePlayAll}>
+                  <Play className="mr-2 h-4 w-4" /> Play All
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>

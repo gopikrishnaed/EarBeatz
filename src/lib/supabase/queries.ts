@@ -129,8 +129,6 @@ export async function getPlaylists(): Promise<PlaylistFromDB[]> {
 export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
     const supabase = createClient();
     
-    // Simplified query to avoid complex nested joins that are causing errors.
-    // We fetch related data separately or handle missing data in the component.
     const { data, error } = await supabase
         .from('feed_posts')
         .select(`
@@ -138,7 +136,12 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
             content,
             created_at,
             users ( id, name, avatar_url ),
-            songs ( id, title ), 
+            songs ( 
+                id, 
+                title, 
+                artists ( name ),
+                albums ( id, title, cover_art_url )
+            ), 
             likes ( user_id ),
             comments ( id )
         `)
@@ -149,4 +152,56 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
         return [];
     }
     return data || [];
+}
+
+
+export async function savePlaylist(
+    title: string, 
+    description: string | null, 
+    songs: Song[],
+    coverArtUrl?: string | null
+): Promise<{ success: boolean; error?: string }> {
+    const supabase = createClient();
+
+    // Step 1: Create the new playlist
+    const { data: playlistData, error: playlistError } = await supabase
+        .from('playlists')
+        .insert({
+            title,
+            description,
+            is_public: true,
+            cover_art_url: coverArtUrl || (songs.length > 0 ? songs[0].album.coverArt.imageUrl : null),
+            // creator_id would be set here if users were authenticated
+        })
+        .select()
+        .single();
+
+    if (playlistError) {
+        console.error('Error saving playlist:', playlistError.message);
+        return { success: false, error: playlistError.message };
+    }
+
+    if (!playlistData) {
+        return { success: false, error: 'Failed to create playlist.' };
+    }
+
+    // Step 2: Prepare the songs to be linked to the new playlist
+    const playlistSongs = songs.map(song => ({
+        playlist_id: playlistData.id,
+        song_id: song.id,
+    }));
+
+    // Step 3: Insert the song links into the playlist_songs table
+    const { error: playlistSongsError } = await supabase
+        .from('playlist_songs')
+        .insert(playlistSongs);
+
+    if (playlistSongsError) {
+        console.error('Error saving playlist songs:', playlistSongsError.message);
+        // Optional: Clean up by deleting the playlist if linking songs fails
+        await supabase.from('playlists').delete().eq('id', playlistData.id);
+        return { success: false, error: playlistSongsError.message };
+    }
+
+    return { success: true };
 }
