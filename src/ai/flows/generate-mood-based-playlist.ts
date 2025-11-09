@@ -41,6 +41,8 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateMoodBasedPlaylistOutputSchema},
   prompt: `You are a playlist generation expert. You will be provided a mood and a desired playlist length and you will respond with a playlist consisting of song names that fit the mood.
 
+You can also use the genre and mood from the song's metadata to make a better selection.
+
 Mood: {{{mood}}}
 Playlist Length: {{{playlistLength}}}
 
