@@ -73,7 +73,7 @@ export function MusicCard({ item }: { item: MusicItem }) {
       <CardContent className="p-4 space-y-3">
         <div className="aspect-square relative">
           <Image
-            src={item.coverArt.imageUrl || `https://picsum.photos/seed/${item.id}/300/300`}
+            src={item.coverArt?.imageUrl || `https://picsum.photos/seed/${item.id}/300/300`}
             alt={item.title}
             fill
             className="rounded-md object-cover"
@@ -81,7 +81,7 @@ export function MusicCard({ item }: { item: MusicItem }) {
         </div>
         <div>
           <h3 className="font-semibold truncate">{item.title}</h3>
-          <p className="text-sm text-muted-foreground truncate">{item.creator}</p>
+          <p className="text-sm text-muted-foreground truncate">{item.creator || 'Unknown Artist'}</p>
         </div>
       </CardContent>
     </Card>
