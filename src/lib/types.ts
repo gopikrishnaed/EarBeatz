@@ -90,3 +90,5 @@ export type FeedPostFromDB = Omit<Database['public']['Tables']['feed_posts']['Ro
   likes: { user_id: string }[];
   comments: { id: string }[];
 }
+
+    

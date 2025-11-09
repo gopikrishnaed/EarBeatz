@@ -92,3 +92,5 @@ export default async function AlbumDetailPage({ params }: { params: { id: string
     </MainLayout>
   );
 }
+
+    
