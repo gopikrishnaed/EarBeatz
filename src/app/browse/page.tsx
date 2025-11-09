@@ -1,53 +1,49 @@
+
 import MainLayout from "@/components/layout/main-layout";
 import { MusicCard } from "@/components/music-card";
-import { getAlbums, getPlaylists } from "@/lib/supabase/queries";
+import { getPlaylists } from "@/lib/supabase/queries";
 import type { MusicItem } from "@/lib/types";
 
-// Helper to get unique items by a key
-function getUniqueItems<T>(items: T[], key: keyof T): T[] {
-  return [...new Map(items.map(item => [item[key], item])).values()];
-}
-
 export default async function BrowsePage() {
-  const albums = await getAlbums();
   const playlists = await getPlaylists();
 
-  const allMusic: MusicItem[] = [
-    ...albums.map(a => ({ id: a.id, type: 'album' as const, title: a.title, creator: a.artists?.name || 'Unknown', coverArt: { imageUrl: a.cover_art_url || '' } })),
-    ...playlists.map(p => ({ id: p.id, type: 'playlist' as const, title: p.title, creator: p.users?.name || 'Unknown', coverArt: { imageUrl: p.cover_art_url || '' } }))
-  ]
+  const playlistItems: MusicItem[] = playlists.map(p => ({ 
+    id: p.id, 
+    type: 'playlist' as const, 
+    title: p.title, 
+    creator: p.users?.name || 'AI Generated', 
+    coverArt: { imageUrl: p.cover_art_url || '' } 
+  }));
 
-  const uniqueMusic = getUniqueItems(allMusic, 'id');
-  const newReleases = [...uniqueMusic].sort(() => 0.5 - Math.random()).slice(0, 6);
-  const topCharts = [...uniqueMusic].sort(() => 0.5 - Math.random()).slice(0, 6);
+  const featuredPlaylists = [...playlistItems].sort(() => 0.5 - Math.random()).slice(0, 12);
 
   return (
     <MainLayout>
       <div>
         <div className="space-y-8">
           <div>
-            <h1 className="text-4xl font-bold font-headline tracking-tight">Browse</h1>
+            <h1 className="text-4xl font-bold font-headline tracking-tight">Browse Playlists</h1>
             <p className="text-muted-foreground">
-              Explore the world of music.
+              Explore curated and AI-generated playlists.
             </p>
           </div>
 
           <section>
-            <h2 className="text-2xl font-semibold font-headline mb-4">New Releases</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {newReleases.map((item) => (
-                <MusicCard key={item.id} item={item} />
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold font-headline mb-4">Top Charts</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {topCharts.map((item) => (
-                <MusicCard key={item.id} item={item} />
-              ))}
-            </div>
+            <h2 className="text-2xl font-semibold font-headline mb-4">Featured Playlists</h2>
+            {featuredPlaylists.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {featuredPlaylists.map((item) => (
+                  <MusicCard key={item.id} item={item} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 border rounded-lg bg-card/50">
+                <p className="text-lg font-medium">No playlists found</p>
+                <p className="text-muted-foreground">
+                  Create a new playlist or use the AI generator to get started.
+                </p>
+              </div>
+            )}
           </section>
         </div>
       </div>
