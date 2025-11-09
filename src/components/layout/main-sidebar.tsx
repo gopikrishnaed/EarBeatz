@@ -11,9 +11,7 @@ import {
   Users,
   LogIn,
   UserPlus,
-  Database,
   Album,
-  Bug,
 } from "lucide-react";
 import {
   SidebarHeader,
@@ -32,7 +30,6 @@ const NAV_ITEMS = [
   { href: "/albums", label: "Albums", icon: Album },
   { href: "/generate", label: "Generate Playlist", icon: Sparkles },
   { href: "/feed", label: "Feed", icon: Users },
-  { href: "/debug", label: "Debug", icon: Bug },
 ];
 
 export default function MainSidebar() {
