@@ -4,10 +4,32 @@ import MainLayout from "@/components/layout/main-layout";
 import { Play } from "lucide-react";
 import { PlayAllButton } from "@/components/play-all-button";
 import { SongItem } from "@/components/song-item";
+import type { Song, SongFromDB } from "@/lib/types";
+
+function mapSongData(songData: SongFromDB, album: Awaited<ReturnType<typeof getAlbumById>>): Song {
+  return {
+      id: songData.id,
+      title: songData.title,
+      songUrl: songData.song_url || '',
+      artist: {
+        id: album?.artists?.id || '',
+        name: album?.artists?.name || 'Unknown Artist'
+      },
+      album: {
+        id: album?.id || '',
+        title: album?.title || 'Unknown Album',
+        coverArt: {
+          imageUrl: album?.cover_art_url || ''
+        }
+      },
+      duration: songData.duration_in_seconds ? `${Math.floor(songData.duration_in_seconds / 60)}:${String(songData.duration_in_seconds % 60).padStart(2, '0')}` : '3:00',
+      metadata: songData.metadata as Song['metadata'] || {}
+  }
+}
 
 export default async function AlbumDetailPage({ params }: { params: { id: string } }) {
   const album = await getAlbumById(params.id);
-  const songs = await getSongsByAlbum(params.id);
+  const songsFromDb = await getSongsByAlbum(params.id);
 
   if (!album) {
     return (
@@ -20,23 +42,7 @@ export default async function AlbumDetailPage({ params }: { params: { id: string
     )
   }
 
-  const mappedSongs = songs.map(song => ({
-    id: song.id,
-    title: song.title,
-    songUrl: song.song_url,
-    duration: song.duration_in_seconds ? `${Math.floor(song.duration_in_seconds / 60)}:${String(song.duration_in_seconds % 60).padStart(2, '0')}` : '3:00',
-    artist: {
-      id: album.artists?.id || '',
-      name: album.artists?.name || 'Unknown Artist'
-    },
-    album: {
-      id: album.id,
-      title: album.title,
-      coverArt: {
-        imageUrl: album.cover_art_url || ''
-      }
-    }
-  }));
+  const songs: Song[] = songsFromDb.map(song => mapSongData(song, album));
 
   return (
     <MainLayout>
@@ -54,16 +60,20 @@ export default async function AlbumDetailPage({ params }: { params: { id: string
             <h1 className="text-3xl font-bold font-headline">{album.title}</h1>
             <p className="text-lg text-muted-foreground">{album.artists?.name || 'Unknown Artist'}</p>
             <div className="mt-4 flex justify-center md:justify-start">
-              {mappedSongs.length > 0 && <PlayAllButton songs={mappedSongs} />}
+              {songs.length > 0 && <PlayAllButton songs={songs} />}
             </div>
           </div>
         </div>
         <div className="w-full md:w-2/3">
           <h2 className="text-2xl font-semibold mb-4 font-headline">Tracks</h2>
           <ul className="space-y-2">
-            {mappedSongs.map((song) => (
-              <SongItem key={song.id} song={song} playlist={mappedSongs} />
-            ))}
+            {songs.length > 0 ? (
+              songs.map((song) => (
+                <SongItem key={song.id} song={song} playlist={songs} />
+              ))
+            ) : (
+              <p className="text-muted-foreground">No tracks found for this album.</p>
+            )}
           </ul>
         </div>
       </div>
