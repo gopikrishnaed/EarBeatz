@@ -69,7 +69,7 @@ export type ArtistFromDB = Database['public']['Tables']['artists']['Row'];
 export type AlbumFromDB = Database['public']['Tables']['albums']['Row'] & {
   artists: { id: string, name: string } | null;
 };
-export type AlbumWithCoverArt = AlbumFromDB & { coverArtUrl: string | null };
+export type AlbumWithCoverArt = AlbumFromDB & { coverArtUrl: string | null; songs: { cover_art_song: string | null }[] };
 
 export type SongFromDB = Omit<Database['public']['Tables']['songs']['Row'], 'artist_id' | 'album_id'> & {
   artists: { id: string; name: string; } | null;

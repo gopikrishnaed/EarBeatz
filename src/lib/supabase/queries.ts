@@ -140,42 +140,29 @@ export async function getAlbums(): Promise<AlbumFromDB[]> {
 
 export async function getAlbumsWithCoverArt(): Promise<AlbumWithCoverArt[]> {
     const supabase = getSupabaseClient();
-    const { data: albums, error: albumsError } = await supabase
+    const { data, error } = await supabase
         .from('albums')
         .select(`
             *,
-            artists ( id, name )
+            artists ( id, name ),
+            songs ( cover_art_song )
         `);
     
-    if (albumsError) {
-        console.error('Error fetching albums:', albumsError);
+    if (error) {
+        console.error('Error fetching albums with cover art:', error);
         return [];
     }
-    if (!albums) return [];
+    if (!data) return [];
 
-    const albumsWithCovers = await Promise.all(
-        albums.map(async (album) => {
-            const { data: song, error: songError } = await supabase
-                .from('songs')
-                .select('cover_art_song')
-                .eq('album_id', album.id)
-                .not('cover_art_song', 'is', null)
-                .limit(1)
-                .maybeSingle();
+    const albumsWithCovers = data.map(album => {
+        const firstSongWithCover = album.songs.find(song => song.cover_art_song);
+        return {
+            ...album,
+            coverArtUrl: firstSongWithCover?.cover_art_song || null,
+        };
+    });
 
-            if (songError) {
-                // Don't log error if no song is found, it's a valid case
-                if (songError.code !== 'PGRST116') {
-                  console.error(`Error fetching cover art for album ${album.id}:`, songError);
-                }
-                return { ...album, coverArtUrl: null };
-            }
-            
-            return { ...album, coverArtUrl: song?.cover_art_song || null };
-        })
-    );
-
-    return albumsWithCovers;
+    return albumsWithCovers as AlbumWithCoverArt[];
 }
 
 export async function getPlaylists(): Promise<PlaylistFromDB[]> {
