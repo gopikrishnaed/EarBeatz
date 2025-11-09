@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -6,7 +7,6 @@ import {
   Music,
   Home,
   Compass,
-  ListMusic,
   Sparkles,
   Users,
   LogIn,
@@ -26,7 +26,6 @@ import {
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/browse", label: "Browse", icon: Compass },
-  { href: "/discover", label: "Discover", icon: ListMusic },
   { href: "/albums", label: "Albums", icon: Album },
   { href: "/generate", label: "Generate Playlist", icon: Sparkles },
   { href: "/feed", label: "Feed", icon: Users },

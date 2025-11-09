@@ -1,11 +1,13 @@
 
 import MainLayout from "@/components/layout/main-layout";
 import { MusicCard } from "@/components/music-card";
-import { getPlaylists } from "@/lib/supabase/queries";
-import type { MusicItem } from "@/lib/types";
+import { getPlaylists, getSongs } from "@/lib/supabase/queries";
+import type { MusicItem, Song } from "@/lib/types";
+import { SongItem } from "@/components/song-item";
 
 export default async function BrowsePage() {
   const playlists = await getPlaylists();
+  const songs = await getSongs();
 
   const playlistItems: MusicItem[] = playlists.map(p => ({ 
     id: p.id, 
@@ -16,15 +18,16 @@ export default async function BrowsePage() {
   }));
 
   const featuredPlaylists = [...playlistItems].sort(() => 0.5 - Math.random()).slice(0, 12);
+  const featuredSongs = [...songs].sort(() => 0.5 - Math.random()).slice(0, 10);
 
   return (
     <MainLayout>
       <div className="max-w-7xl mx-auto">
         <div className="space-y-8">
           <div>
-            <h1 className="text-4xl font-bold font-headline tracking-tight">Browse Playlists</h1>
+            <h1 className="text-4xl font-bold font-headline tracking-tight">Browse</h1>
             <p className="text-muted-foreground">
-              Explore curated and AI-generated playlists.
+              Explore playlists and songs from your library.
             </p>
           </div>
 
@@ -44,6 +47,19 @@ export default async function BrowsePage() {
                 </p>
               </div>
             )}
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold font-headline mb-4">All Songs</h2>
+            {featuredSongs.length > 0 ? (
+              <ul className="space-y-2">
+                  {featuredSongs.map((song) => (
+                      <SongItem key={song.id} song={song} playlist={songs} />
+                  ))}
+              </ul>
+              ) : (
+                  <p className="text-muted-foreground">No songs found in your library yet.</p>
+              )}
           </section>
         </div>
       </div>
