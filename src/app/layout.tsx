@@ -1,9 +1,6 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import { MusicPlayerProvider } from '@/context/music-player-context';
-import { getSongs } from '@/lib/supabase/queries';
-import type { Song } from '@/lib/types';
 
 export const metadata: Metadata = {
   title: 'EarBeatz',
@@ -15,8 +12,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialPlaylist = await getSongs();
-  
   return (
     <html lang="en" className="dark">
       <head>
@@ -25,9 +20,7 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <MusicPlayerProvider initialPlaylist={initialPlaylist}>
-          {children}
-        </MusicPlayerProvider>
+        {children}
         <Toaster />
       </body>
     </html>
