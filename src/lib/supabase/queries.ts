@@ -4,7 +4,7 @@
 import { createClient as createServerClient } from './server-client';
 import { createClient as createBrowserClient } from './client';
 import { serviceRoleClient } from './service-role';
-import type { AlbumFromDB, AlbumWithCoverArt, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB, FeedPostInsert, UserFromDB } from '@/lib/types';
+import type { AlbumFromDB, AlbumWithCoverArt, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB, FeedPostInsert, UserFromDB, UserInsert } from '@/lib/types';
 
 // This client is for components and server actions that need the user's session.
 const getSupabaseClient = () => {
@@ -33,6 +33,35 @@ export async function loginUser(email: string, password: string): Promise<{ succ
   // For this prototype, we'll do a simple string comparison.
   if (data.password !== password) {
     return { success: false, error: 'Invalid password.' };
+  }
+
+  return { success: true };
+}
+
+export async function signupUser(user: UserInsert): Promise<{ success: boolean; error?: string }> {
+  const supabase = serviceRoleClient;
+
+  // Check if user already exists
+  const { data: existingUser, error: existingUserError } = await supabase
+    .from('users')
+    .select('id')
+    .eq('email', user.email)
+    .single();
+
+  if (existingUser) {
+    return { success: false, error: 'A user with this email already exists.' };
+  }
+  
+  if (existingUserError && existingUserError.code !== 'PGRST116') { // PGRST116: "exact one row expected" which is fine if user doesn't exist
+    console.error('Error checking for existing user:', existingUserError.message);
+    return { success: false, error: existingUserError.message };
+  }
+  
+  const { error } = await supabase.from('users').insert(user);
+
+  if (error) {
+    console.error('Error signing up user:', error.message);
+    return { success: false, error: error.message };
   }
 
   return { success: true };

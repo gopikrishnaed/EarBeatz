@@ -1,6 +1,3 @@
-
-
-
 // These types are for data structures used in the frontend components.
 import type { Database, TablesInsert } from './types/supabase';
 
@@ -64,6 +61,7 @@ export type FeedPost = {
 };
 
 export type FeedPostInsert = TablesInsert<'feed_posts'>;
+export type UserInsert = TablesInsert<'users'>;
 
 
 // These types represent the data structure as it comes from the Supabase database.
