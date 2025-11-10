@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -38,11 +39,7 @@ export function SignupForm() {
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
     try {
-      const result = await signupUser({
-        name: values.name,
-        email: values.email,
-        password: values.password, // In a real app, hash this password!
-      });
+      const result = await signupUser(values);
       
       if (result.success) {
         toast({

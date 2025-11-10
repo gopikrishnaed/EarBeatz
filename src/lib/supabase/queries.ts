@@ -15,7 +15,6 @@ const getSupabaseClient = () => {
 }
 
 export async function loginUser(email: string, password: string): Promise<{ success: boolean; error?: string }> {
-  // Use the service role client for login to bypass RLS
   const supabase = serviceRoleClient;
   
   const { data, error } = await supabase
@@ -38,7 +37,7 @@ export async function loginUser(email: string, password: string): Promise<{ succ
   return { success: true };
 }
 
-export async function signupUser(user: UserInsert): Promise<{ success: boolean; error?: string }> {
+export async function signupUser(user: Omit<UserInsert, 'id' | 'created_at' | 'avatar_url'>): Promise<{ success: boolean; error?: string }> {
   const supabase = serviceRoleClient;
 
   // Check if user already exists
@@ -57,7 +56,11 @@ export async function signupUser(user: UserInsert): Promise<{ success: boolean; 
     return { success: false, error: existingUserError.message };
   }
   
-  const { error } = await supabase.from('users').insert(user);
+  const { error } = await supabase.from('users').insert({
+    name: user.name,
+    email: user.email,
+    password: user.password
+  });
 
   if (error) {
     console.error('Error signing up user:', error.message);
