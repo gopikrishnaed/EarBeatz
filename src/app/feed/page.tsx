@@ -4,7 +4,7 @@ import MainLayout from "@/components/layout/main-layout";
 import { FeedPostCard } from "@/components/feed-post-card";
 import { getFeedPosts, getSongs, getUsers } from "@/lib/supabase/queries";
 import { formatDistanceToNow } from 'date-fns';
-import type { FeedPost, FeedPostFromDB, Song, UserFromDB } from "@/lib/types";
+import type { FeedPost, Song, UserFromDB } from "@/lib/types";
 import { CreatePostForm } from "@/components/create-post-form";
 
 export default async function FeedPage() {
@@ -14,35 +14,46 @@ export default async function FeedPage() {
 
   const formattedPosts: FeedPost[] = posts
     .map(post => {
-      // Basic validation to ensure the post has the minimum required data
-      if (!post.users || !post.songs) {
+      const user = post.users ? {
+        id: post.users.id,
+        name: post.users.name || 'Unknown User',
+        avatar: {
+          imageUrl: post.users.avatar_url || '',
+        }
+      } : {
+        id: 'unknown-user',
+        name: 'Unknown User',
+        avatar: { imageUrl: '' }
+      };
+
+      const song = post.songs ? {
+        id: post.songs.id,
+        title: post.songs.title || 'Unknown Song',
+        songUrl: post.songs.song_url || '',
+        artist: {
+          id: post.songs.artists?.id || '',
+          name: post.songs.artists?.name || 'Unknown Artist',
+        },
+        album: {
+          id: post.songs.albums?.id || '',
+          title: post.songs.albums?.title || 'Unknown Album',
+        },
+        coverArt: {
+          imageUrl: post.songs.cover_art_song || ''
+        },
+        duration: post.songs.duration_in_seconds ? `${Math.floor(post.songs.duration_in_seconds / 60)}:${String(post.songs.duration_in_seconds % 60).padStart(2, '0')}` : '0:00',
+        metadata: post.songs.metadata as Song['metadata'] || {}
+      } : null;
+
+      // Only include posts that have a song attached
+      if (!song) {
         return null;
       }
+
       return {
         id: post.id,
-        user: {
-          id: post.users.id,
-          name: post.users.name || 'Unknown User',
-          avatar: {
-            imageUrl: post.users.avatar_url || '',
-          }
-        },
-        song: {
-          id: post.songs.id,
-          title: post.songs.title || 'Unknown Song',
-          songUrl: post.songs.song_url || '',
-          artist: {
-            id: post.songs.artists?.id || '',
-            name: post.songs.artists?.name || 'Unknown Artist',
-          },
-          album: {
-            id: post.songs.albums?.id || '',
-            title: post.songs.albums?.title || 'Unknown Album',
-          },
-          coverArt: {
-            imageUrl: post.songs.cover_art_song || ''
-          },
-        } as Song,
+        user: user,
+        song: song,
         content: post.content || '',
         likes: post.likes?.length || 0,
         comments: post.comments?.length || 0,
@@ -51,7 +62,6 @@ export default async function FeedPage() {
     })
     .filter((post): post is FeedPost => post !== null);
 
-  // Use a real user from the database to prevent foreign key violations.
   const currentUser = users.length > 0 ? users[0] : null;
 
   return (
