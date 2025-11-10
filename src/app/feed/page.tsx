@@ -2,7 +2,7 @@
 
 import MainLayout from "@/components/layout/main-layout";
 import { FeedPostCard } from "@/components/feed-post-card";
-import { getFeedPosts, getSongs } from "@/lib/supabase/queries";
+import { getFeedPosts, getSongs, getUsers } from "@/lib/supabase/queries";
 import { formatDistanceToNow } from 'date-fns';
 import type { FeedPost, FeedPostFromDB, Song, UserFromDB } from "@/lib/types";
 import { CreatePostForm } from "@/components/create-post-form";
@@ -10,6 +10,7 @@ import { CreatePostForm } from "@/components/create-post-form";
 export default async function FeedPage() {
   const posts = await getFeedPosts();
   const songs = await getSongs();
+  const users = await getUsers();
 
   const formattedPosts: FeedPost[] = posts
     .map(post => {
@@ -50,14 +51,8 @@ export default async function FeedPage() {
     })
     .filter((post): post is FeedPost => post !== null);
 
-  // Hardcoded user for now, in a real app this would come from auth
-  const currentUser: UserFromDB = {
-    id: 'f5e4b3a2-1c9d-4f38-9a6b-7b8c9d0e1f2a',
-    name: 'Jane Doe',
-    email: 'jane.doe@example.com',
-    created_at: new Date().toISOString(),
-    avatar_url: 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwZXJzb24lMjBzbWlsaW5nfGVufDB8fHx8MTc1OTEyNDY1Nnww&ixlib=rb-4.1.0&q=80&w=1080',
-  }
+  // Use a real user from the database to prevent foreign key violations.
+  const currentUser = users.length > 0 ? users[0] : null;
 
   return (
     <MainLayout>
@@ -72,7 +67,17 @@ export default async function FeedPage() {
             </p>
           </div>
 
-          <CreatePostForm songs={songs} user={currentUser} />
+          {currentUser ? (
+            <CreatePostForm songs={songs} user={currentUser} />
+          ) : (
+             <div className="text-center py-10 border rounded-lg bg-card/50">
+                <p className="text-lg font-medium">Cannot Create Post</p>
+                <p className="text-muted-foreground">
+                  No users found in the database to post as.
+                </p>
+              </div>
+          )}
+
 
           <div className="space-y-6">
             {formattedPosts.length > 0 ? (

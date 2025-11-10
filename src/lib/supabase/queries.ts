@@ -4,7 +4,7 @@
 
 import { createClient as createServerClient } from './server-client';
 import { createClient as createBrowserClient } from './client';
-import type { AlbumFromDB, AlbumWithCoverArt, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB, FeedPostInsert } from '@/lib/types';
+import type { AlbumFromDB, AlbumWithCoverArt, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB, FeedPostInsert, UserFromDB } from '@/lib/types';
 
 // Use a client that doesn't rely on the cookie store for server-side queries
 // to avoid issues with Next.js server component rendering.
@@ -274,4 +274,19 @@ export async function savePlaylist(
     }
 
     return { success: true };
+}
+
+
+export async function getUsers(): Promise<UserFromDB[]> {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+        .from('users')
+        .select('*');
+
+    if (error) {
+        console.error('Error fetching users:', error);
+        return [];
+    }
+
+    return data || [];
 }
