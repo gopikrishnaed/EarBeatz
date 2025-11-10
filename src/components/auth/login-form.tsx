@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { loginUser } from "@/lib/supabase/queries";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -36,26 +35,9 @@ export function LoginForm() {
 
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
-    try {
-      const result = await loginUser(values.email, values.password);
-      if (result.success) {
-        router.push('/dashboard');
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: result.error || "Invalid email or password. Please try again.",
-        });
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Login Failed",
-        description: "An unexpected error occurred. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    // Dummy login: just redirect to the dashboard after a short delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    router.push('/dashboard');
   }
 
   return (
