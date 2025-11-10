@@ -1,10 +1,9 @@
 
 "use client";
 
-import { Search, Bell, User, LogOut, Settings } from "lucide-react";
+import { Bell, User, LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,12 +13,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SearchBar } from "./search-bar";
 
 export function Header() {
   const router = useRouter();
 
   const handleLogout = () => {
-    // In a real app, you'd clear auth state here
     router.push("/login");
   };
 
@@ -29,11 +28,7 @@ export function Header() {
         <SidebarTrigger />
       </div>
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <Input
-          placeholder="Search songs, artists, playlists..."
-          className="pl-10 w-full md:w-96"
-        />
+        <SearchBar />
       </div>
       <div className="flex items-center gap-2">
         <DropdownMenu>

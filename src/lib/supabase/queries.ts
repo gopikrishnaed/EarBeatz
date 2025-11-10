@@ -35,9 +35,8 @@ export async function loginUser(
   email: string,
   password: string
 ): Promise<{ success: boolean; error?: string }> {
-  // Server-only: uses service role so RLS is bypassed safely in server actions.
+  // Dummy login: as long as user exists, login is successful.
   const supabase = serviceRoleClient;
-
   const { data, error } = await supabase
     .from('users')
     .select('id')
@@ -49,9 +48,9 @@ export async function loginUser(
     return { success: false, error: 'User not found.' };
   }
 
-  // Dummy login: as long as user exists, login is successful.
   return { success: true };
 }
+
 
 /**
  * SIGNUP (hash the password before insert)
@@ -77,13 +76,10 @@ export async function signupUser(
     return { success: false, error: 'A user with this email already exists.' };
   }
 
-  // Dummy password hash
-  const password_hash = 'dummy-hash';
-
   const { error } = await supabase.from('users').insert({
     name: user.name,
     email: user.email,
-    password_hash
+    password_hash: 'dummy-hash' // We are not using real passwords
   });
 
   if (error) {
@@ -386,4 +382,47 @@ export async function getUsers(): Promise<UserFromDB[]> {
     return [];
   }
   return (data as UserFromDB[]) || [];
+}
+
+export async function searchMusic(query: string): Promise<{ songs: Song[], albums: AlbumWithCoverArt[] }> {
+  if (!query) {
+    return { songs: [], albums: [] };
+  }
+  
+  const supabase = getSupabaseClient();
+  
+  const [songsRes, albumsRes] = await Promise.all([
+    supabase
+      .from('songs')
+      .select('*, artists(*), albums(*)')
+      .ilike('title', `%${query}%`),
+    supabase
+      .from('albums')
+      .select('*, artists(*), songs(cover_art_song)')
+      .ilike('title', `%${query}%`)
+  ]);
+
+  if (songsRes.error) {
+    console.error('Error searching songs:', songsRes.error.message);
+  }
+  if (albumsRes.error) {
+    console.error('Error searching albums:', albumsRes.error.message);
+  }
+  
+  const songs = (songsRes.data || []).map(mapSongData);
+
+  const albumsWithCovers = (albumsRes.data || []).map((album: any) => {
+    const firstSongWithCover = (album.songs || []).find(
+      (song: any) => song.cover_art_song
+    );
+    return {
+      ...album,
+      coverArtUrl: firstSongWithCover?.cover_art_song || null,
+    };
+  });
+
+  return {
+    songs,
+    albums: albumsWithCovers as AlbumWithCoverArt[],
+  };
 }
