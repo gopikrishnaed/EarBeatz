@@ -1,5 +1,6 @@
 
 
+
 'use server';
 
 import { createClient as createServerClient } from './server-client';
@@ -14,6 +15,27 @@ const getSupabaseClient = () => {
     return createServerClient();
   }
   return createBrowserClient();
+}
+
+export async function loginUser(email: string, password: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('users')
+    .select('password')
+    .eq('email', email)
+    .single();
+
+  if (error || !data) {
+    return { success: false, error: 'User not found.' };
+  }
+
+  // In a real app, you should use a secure password hashing library like bcrypt.
+  // For this prototype, we'll do a simple string comparison.
+  if (data.password !== password) {
+    return { success: false, error: 'Invalid password.' };
+  }
+
+  return { success: true };
 }
 
 
@@ -184,8 +206,6 @@ export async function getPlaylists(): Promise<PlaylistFromDB[]> {
 export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
     const supabase = getSupabaseClient();
     
-    // This query is intentionally simplified to be more robust.
-    // We explicitly define the relationship to 'users' to avoid ambiguity.
     const { data, error } = await supabase
         .from('feed_posts')
         .select(`
@@ -203,7 +223,7 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
         `)
         .order('created_at', { ascending: false });
 
-    if (error && Object.keys(error).length > 0) {
+    if (error) {
         console.error('Error fetching feed posts:', error.message);
         return [];
     }
@@ -292,3 +312,5 @@ export async function getUsers(): Promise<UserFromDB[]> {
 
     return data || [];
 }
+
+    

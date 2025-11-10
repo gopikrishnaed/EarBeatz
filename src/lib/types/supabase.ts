@@ -300,6 +300,7 @@ export type Database = {
           email: string | null
           id: string
           name: string
+          password: string
         }
         Insert: {
           avatar_url?: string | null
@@ -307,6 +308,7 @@ export type Database = {
           email?: string | null
           id?: string
           name: string
+          password: string
         }
         Update: {
           avatar_url?: string | null
@@ -314,6 +316,7 @@ export type Database = {
           email?: string | null
           id?: string
           name?: string
+          password?: string
         }
         Relationships: []
       }
@@ -414,5 +417,7 @@ export type Enums<
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
     : never
+
+    
 
     
