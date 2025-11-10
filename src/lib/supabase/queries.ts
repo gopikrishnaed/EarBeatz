@@ -4,7 +4,6 @@
 import { createClient as createServerClient } from './server-client';
 import { createClient as createBrowserClient } from './client';
 import { serviceRoleClient } from './service-role';
-import bcrypt from 'bcryptjs';
 
 import type {
   AlbumFromDB,
@@ -41,7 +40,7 @@ export async function loginUser(
 
   const { data, error } = await supabase
     .from('users')
-    .select('id, password_hash')
+    .select('id')
     .eq('email', email)
     .single();
 
@@ -50,12 +49,7 @@ export async function loginUser(
     return { success: false, error: 'User not found.' };
   }
 
-  const ok = await bcrypt.compare(password, data.password_hash || '');
-  if (!ok) {
-    return { success: false, error: 'Invalid password.' };
-  }
-
-  // If you want a session/cookie, use Supabase Auth. This function only validates.
+  // Dummy login: as long as user exists, login is successful.
   return { success: true };
 }
 
@@ -83,8 +77,8 @@ export async function signupUser(
     return { success: false, error: 'A user with this email already exists.' };
   }
 
-  // Hash the password (cost 10 is a good default)
-  const password_hash = await bcrypt.hash(user.password, 10);
+  // Dummy password hash
+  const password_hash = 'dummy-hash';
 
   const { error } = await supabase.from('users').insert({
     name: user.name,
@@ -300,7 +294,7 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
         artists ( id, name ),
         albums  ( id, title )
       ), 
-      likes    ( user_id ),
+      likes ( user_id ),
       comments ( id )
     `
     )
