@@ -184,13 +184,15 @@ export async function getPlaylists(): Promise<PlaylistFromDB[]> {
 export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
     const supabase = getSupabaseClient();
     
+    // This query is intentionally simplified to be more robust.
+    // We explicitly define the relationship to 'users' to avoid ambiguity.
     const { data, error } = await supabase
         .from('feed_posts')
         .select(`
             id,
             content,
             created_at,
-            users ( id, name, avatar_url ),
+            users:user_id ( id, name, avatar_url ),
             songs ( 
                 *,
                 artists ( id, name ),
@@ -202,13 +204,11 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
         .order('created_at', { ascending: false });
 
     if (error && Object.keys(error).length > 0) {
-        // We log the error but don't re-throw it, to avoid crashing the page.
-        // An empty array will be returned, and the UI will show an empty feed.
         console.error('Error fetching feed posts:', error.message);
         return [];
     }
 
-    return (data as FeedPostFromDB[]) || [];
+    return (data as unknown as FeedPostFromDB[]) || [];
 }
 
 export async function createFeedPost(

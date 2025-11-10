@@ -14,11 +14,14 @@ export default async function FeedPage() {
 
   const formattedPosts: FeedPost[] = posts
     .map(post => {
-      const user = post.users ? {
-        id: post.users.id,
-        name: post.users.name || 'Unknown User',
+      // Ensure post.users is not an array and has the correct shape
+      const postUser = Array.isArray(post.users) ? post.users[0] : post.users;
+
+      const user = postUser ? {
+        id: postUser.id,
+        name: postUser.name || 'Unknown User',
         avatar: {
-          imageUrl: post.users.avatar_url || '',
+          imageUrl: postUser.avatar_url || '',
         }
       } : {
         id: 'unknown-user',
@@ -26,41 +29,39 @@ export default async function FeedPage() {
         avatar: { imageUrl: '' }
       };
 
-      const song = post.songs ? {
-        id: post.songs.id,
-        title: post.songs.title || 'Unknown Song',
-        songUrl: post.songs.song_url || '',
+      const postSong = Array.isArray(post.songs) ? post.songs[0] : post.songs;
+      
+      const song = postSong ? {
+        id: postSong.id,
+        title: postSong.title || 'Unknown Song',
+        songUrl: postSong.song_url || '',
         artist: {
-          id: post.songs.artists?.id || 'unknown-artist',
-          name: post.songs.artists?.name || 'Unknown Artist',
+          id: postSong.artists?.id || 'unknown-artist',
+          name: postSong.artists?.name || 'Unknown Artist',
         },
         album: {
-          id: post.songs.albums?.id || 'unknown-album',
-          title: post.songs.albums?.title || 'Unknown Album',
+          id: postSong.albums?.id || 'unknown-album',
+          title: postSong.albums?.title || 'Unknown Album',
         },
         coverArt: {
-          imageUrl: post.songs.cover_art_song || ''
+          imageUrl: postSong.cover_art_song || ''
         },
-        duration: post.songs.duration_in_seconds ? `${Math.floor(post.songs.duration_in_seconds / 60)}:${String(post.songs.duration_in_seconds % 60).padStart(2, '0')}` : '0:00',
-        metadata: post.songs.metadata as Song['metadata'] || {}
+        duration: postSong.duration_in_seconds ? `${Math.floor(postSong.duration_in_seconds / 60)}:${String(postSong.duration_in_seconds % 60).padStart(2, '0')}` : '0:00',
+        metadata: postSong.metadata as Song['metadata'] || {}
       } : null;
 
-      // Only include posts that have a song attached for a better UI experience
-      if (!song) {
-        return null;
-      }
-
+      // Now, we create the post object but will rely on the Card to handle null songs
       return {
         id: post.id,
         user: user,
-        song: song,
+        song: song!, // Assert that song is not null, FeedPostCard will handle it.
         content: post.content || '',
         likes: post.likes?.length || 0,
         comments: post.comments?.length || 0,
         timestamp: post.created_at ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true }) : 'just now',
       }
     })
-    .filter((post): post is FeedPost => post !== null);
+    .filter(Boolean); // Filter out any potential nulls from map if needed, though we handle it inside
 
   const currentUser = users.length > 0 ? users[0] : null;
 
