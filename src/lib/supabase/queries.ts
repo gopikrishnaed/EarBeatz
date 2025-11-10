@@ -202,7 +202,9 @@ export async function getFeedPosts(): Promise<FeedPostFromDB[]> {
         .order('created_at', { ascending: false });
 
     if (error && Object.keys(error).length > 0) {
-        console.error('Error fetching feed posts:', error);
+        // We log the error but don't re-throw it, to avoid crashing the page.
+        // An empty array will be returned, and the UI will show an empty feed.
+        console.error('Error fetching feed posts:', error.message);
         return [];
     }
 

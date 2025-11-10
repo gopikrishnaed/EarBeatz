@@ -31,11 +31,11 @@ export default async function FeedPage() {
         title: post.songs.title || 'Unknown Song',
         songUrl: post.songs.song_url || '',
         artist: {
-          id: post.songs.artists?.id || '',
+          id: post.songs.artists?.id || 'unknown-artist',
           name: post.songs.artists?.name || 'Unknown Artist',
         },
         album: {
-          id: post.songs.albums?.id || '',
+          id: post.songs.albums?.id || 'unknown-album',
           title: post.songs.albums?.title || 'Unknown Album',
         },
         coverArt: {
@@ -45,7 +45,7 @@ export default async function FeedPage() {
         metadata: post.songs.metadata as Song['metadata'] || {}
       } : null;
 
-      // Only include posts that have a song attached
+      // Only include posts that have a song attached for a better UI experience
       if (!song) {
         return null;
       }
