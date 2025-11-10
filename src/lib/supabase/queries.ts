@@ -1,16 +1,13 @@
 
-
-
 'use server';
 
 import { createClient as createServerClient } from './server-client';
 import { createClient as createBrowserClient } from './client';
+import { serviceRoleClient } from './service-role';
 import type { AlbumFromDB, AlbumWithCoverArt, FeedPostFromDB, PlaylistFromDB, Song, SongFromDB, FeedPostInsert, UserFromDB } from '@/lib/types';
 
-// Use a client that doesn't rely on the cookie store for server-side queries
-// to avoid issues with Next.js server component rendering.
+// This client is for components and server actions that need the user's session.
 const getSupabaseClient = () => {
-  // This function needs to be async to correctly handle cookies.
   if (typeof window === 'undefined') {
     return createServerClient();
   }
@@ -18,7 +15,9 @@ const getSupabaseClient = () => {
 }
 
 export async function loginUser(email: string, password: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = getSupabaseClient();
+  // Use the service role client for login to bypass RLS
+  const supabase = serviceRoleClient;
+  
   const { data, error } = await supabase
     .from('users')
     .select('password')
@@ -26,6 +25,7 @@ export async function loginUser(email: string, password: string): Promise<{ succ
     .single();
 
   if (error || !data) {
+    console.error('Login error:', error?.message);
     return { success: false, error: 'User not found.' };
   }
 
@@ -312,5 +312,3 @@ export async function getUsers(): Promise<UserFromDB[]> {
 
     return data || [];
 }
-
-    
