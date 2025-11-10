@@ -40,8 +40,7 @@ export async function loginUser(email: string, password: string): Promise<{ succ
 export async function signupUser(user: Omit<UserInsert, 'id' | 'created_at' | 'avatar_url'>): Promise<{ success: boolean; error?: string }> {
   const supabase = serviceRoleClient;
 
-  // Check if user already exists
-  const { data: existingUser, error: existingUserError } = await supabase
+  const { data: existingUser } = await supabase
     .from('users')
     .select('id')
     .eq('email', user.email)
@@ -51,15 +50,10 @@ export async function signupUser(user: Omit<UserInsert, 'id' | 'created_at' | 'a
     return { success: false, error: 'A user with this email already exists.' };
   }
   
-  if (existingUserError && existingUserError.code !== 'PGRST116') { // PGRST116: "exact one row expected" which is fine if user doesn't exist
-    console.error('Error checking for existing user:', existingUserError.message);
-    return { success: false, error: existingUserError.message };
-  }
-  
   const { error } = await supabase.from('users').insert({
     name: user.name,
     email: user.email,
-    password: user.password
+    password: user.password,
   });
 
   if (error) {
