@@ -61,7 +61,7 @@ export type FeedPost = {
 };
 
 export type FeedPostInsert = TablesInsert<'feed_posts'>;
-export type UserInsert = TablesInsert<'users'>;
+export type UserInsert = Omit<TablesInsert<'users'>, 'password'> & { password_hash: string };
 
 
 // These types represent the data structure as it comes from the Supabase database.
