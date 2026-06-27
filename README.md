@@ -2,46 +2,35 @@
 
 EarBeatz is a modern music streaming and social platform built with Next.js, Supabase, and Genkit AI.
 
-## Features
+## 🚀 Getting Started
 
-- **AI Playlist Generation:** Create custom playlists based on your mood using Google's Gemini.
-- **Social Feed:** Share what you're listening to and interact with friends.
-- **Music Library:** Browse songs, albums, and playlists.
-- **Search:** Find your favorite tracks and artists instantly.
+### 1. Find Your Project Folder
+If you're not sure where these files are on your computer:
+- **In VS Code:** Right-click any file in the left sidebar and select "Reveal in Finder" (Mac) or "Reveal in File Explorer" (Windows).
+- **In the Terminal:** Type `pwd` (Mac/Linux) or `echo %cd%` (Windows) to see the full path.
 
-## How to Push to GitHub (Safely)
+### 2. Open the Terminal
+- In VS Code, press ``Ctrl + ` `` (backtick) or go to **Terminal > New Terminal**.
 
-1. **Create a new repository** on [GitHub](https://github.com/new). Do **not** initialize it with a README or .gitignore (we already have them).
-2. **Open your terminal** in the project folder.
-3. **Initialize Git:**
+### 3. Push to GitHub (Safely)
+1. **Create a new repository** on [GitHub](https://github.com/new). Do **not** initialize it with a README or .gitignore.
+2. **Run these commands** in your terminal:
    ```bash
    git init
-   ```
-4. **Add your files:**
-   ```bash
    git add .
-   ```
-5. **Commit your changes:**
-   ```bash
    git commit -m "Initial commit"
-   ```
-6. **Link to GitHub:** (Replace `<your-repo-url>` with the URL from step 1)
-   ```bash
+   git branch -M main
    git remote add origin <your-repo-url>
-   ```
-7. **Push your code:**
-   ```bash
    git push -u origin main
    ```
 
-## Local Development Setup
+## 🛠 Local Development Setup
 
-1. **Clone the repository.**
-2. **Setup Environment Variables:**
-   - Copy `.env.example` to a new file named `.env.local`.
-   - Fill in your Supabase and Google AI API keys.
-   - **Note:** The `.gitignore` file ensures your `.env.local` is never uploaded to GitHub.
-3. **Run the development server:**
+1. **Setup Environment Variables:**
+   - Create a file named `.env` in the root folder.
+   - Copy the keys from your provider (Supabase/Google AI) into it.
+   - **Note:** The `.gitignore` file ensures your `.env` is never uploaded to GitHub.
+2. **Run the development server:**
    ```bash
    npm run dev
    ```
