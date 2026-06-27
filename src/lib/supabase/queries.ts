@@ -29,7 +29,7 @@ const getSupabaseClient = () => {
 };
 
 /**
- * LOGIN (custom users table with hashed passwords)
+ * LOGIN (custom users table with shashed passwords)
  */
 export async function loginUser(
   email: string,
